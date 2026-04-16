@@ -18,6 +18,10 @@ public class Repisa {
     @Column(name = "descripcion", length = 100)
     private String descripcion;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_empresa", nullable = false)
+    private Empresa empresa;
+
     @OneToMany(mappedBy = "repisa", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Ubicacion> ubicaciones;
 
@@ -51,5 +55,13 @@ public class Repisa {
 
     public void setUbicaciones(List<Ubicacion> ubicaciones) {
         this.ubicaciones = ubicaciones;
+    }
+
+    public Empresa getEmpresa() {
+        return empresa;
+    }
+
+    public void setEmpresa(Empresa empresa) {
+        this.empresa = empresa;
     }
 }

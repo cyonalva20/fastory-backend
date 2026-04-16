@@ -22,6 +22,10 @@ public class Devolucion {
     @JoinColumn(name = "id_proveedor", nullable = false)
     private Proveedor proveedor;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_empresa", nullable = false)
+    private Empresa empresa;
+
     // Guardamos el código del lote vencido como referencia histórica
     // No relacionamos directamente la entidad Lote porque el lote podría ser
     // eliminado o vaciado
@@ -114,5 +118,13 @@ public class Devolucion {
 
     public void setEstado(String estado) {
         this.estado = estado;
+    }
+
+    public Empresa getEmpresa() {
+        return empresa;
+    }
+
+    public void setEmpresa(Empresa empresa) {
+        this.empresa = empresa;
     }
 }

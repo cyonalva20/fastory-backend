@@ -16,6 +16,10 @@ public class Lote {
     @JoinColumn(name = "id_producto", nullable = false)
     private Producto producto;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_empresa", nullable = false)
+    private Empresa empresa;
+
     @Column(name = "codigo_lote", nullable = false, unique = true, length = 50)
     private String codigoLote;
 
@@ -92,5 +96,13 @@ public class Lote {
 
     public void setMovimientoInventario(MovimientoInventario movimientoInventario) {
         this.movimientoInventario = movimientoInventario;
+    }
+
+    public Empresa getEmpresa() {
+        return empresa;
+    }
+
+    public void setEmpresa(Empresa empresa) {
+        this.empresa = empresa;
     }
 }

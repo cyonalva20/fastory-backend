@@ -17,6 +17,10 @@ public class Ubicacion {
     @JoinColumn(name = "id_repisa", nullable = false)
     private Repisa repisa;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_empresa", nullable = false)
+    private Empresa empresa;
+
     @Column(name = "fila", nullable = false)
     private Integer fila;
 
@@ -67,5 +71,13 @@ public class Ubicacion {
 
     public void setEstado(String estado) {
         this.estado = estado;
+    }
+
+    public Empresa getEmpresa() {
+        return empresa;
+    }
+
+    public void setEmpresa(Empresa empresa) {
+        this.empresa = empresa;
     }
 }
