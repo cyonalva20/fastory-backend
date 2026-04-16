@@ -25,6 +25,10 @@ public class MovimientoInventario {
     @JoinColumn(name = "id_usuario", nullable = false)
     private Usuario usuario;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_empresa", nullable = false)
+    private Empresa empresa;
+
     // --- NUEVA RELACIÓN AÑADIDA ---
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_proveedor") // Será null para movimientos de SALIDA
@@ -94,13 +98,20 @@ public class MovimientoInventario {
         this.lotes = lotes;
     }
 
-    // --- GETTER Y SETTER PARA PROVEEDOR ---
     public Proveedor getProveedor() {
         return proveedor;
     }
 
     public void setProveedor(Proveedor proveedor) {
         this.proveedor = proveedor;
+    }
+
+    public Empresa getEmpresa() {
+        return empresa;
+    }
+
+    public void setEmpresa(Empresa empresa) {
+        this.empresa = empresa;
     }
     // ------------------------------------
 }
