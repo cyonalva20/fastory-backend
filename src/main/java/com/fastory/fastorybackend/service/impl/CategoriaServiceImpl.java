@@ -43,7 +43,7 @@ public class CategoriaServiceImpl implements CategoriaService {
 
         Categoria nuevaCategoria = new Categoria();
         nuevaCategoria.setNombreCategoria(createDto.getNombreCategoria());
-        nuevaCategoria.setDescripcion(createDto.getDescripcion());
+        // Campo 'descripcion' eliminado de la entidad Categoria en el nuevo esquema
 
         Categoria categoriaGuardada = categoriaRepository.save(nuevaCategoria);
 
@@ -66,7 +66,7 @@ public class CategoriaServiceImpl implements CategoriaService {
                 });
 
         categoria.setNombreCategoria(updateDto.getNombreCategoria());
-        categoria.setDescripcion(updateDto.getDescripcion());
+        // Campo 'descripcion' eliminado de la entidad Categoria en el nuevo esquema
 
         Categoria categoriaActualizada = categoriaRepository.save(categoria);
         return mapEntityToDto(categoriaActualizada);
@@ -91,7 +91,7 @@ public class CategoriaServiceImpl implements CategoriaService {
         CategoriaDto dto = new CategoriaDto();
         dto.setIdCategoria(categoria.getIdCategoria());
         dto.setNombreCategoria(categoria.getNombreCategoria());
-        dto.setDescripcion(categoria.getDescripcion());
+        // Campo 'descripcion' eliminado de la entidad Categoria en el nuevo esquema
         dto.setCantidadProductos(categoria.getProductos() != null ? categoria.getProductos().size() : 0);
         return dto;
     }

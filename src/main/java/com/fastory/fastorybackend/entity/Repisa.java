@@ -4,26 +4,23 @@ import jakarta.persistence.*;
 import java.util.List;
 
 @Entity
-@Table(name = "repisa")
-public class Repisa {
+@Table(name = "repisa", uniqueConstraints = {
+        @UniqueConstraint(name = "uq_repisa_tenant", columnNames = {"id_empresa", "codigo"})
+})
+public class Repisa extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_repisa")
     private Integer idRepisa;
 
-    @Column(name = "codigo", nullable = false, unique = true, length = 10)
+    @Column(name = "codigo", nullable = false, length = 20)
     private String codigo;
-
-    @Column(name = "descripcion", length = 100)
-    private String descripcion;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_empresa", nullable = false)
-    private Empresa empresa;
 
     @OneToMany(mappedBy = "repisa", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Ubicacion> ubicaciones;
+
+    // --- Getters y Setters ---
 
     public Integer getIdRepisa() {
         return idRepisa;
@@ -41,27 +38,11 @@ public class Repisa {
         this.codigo = codigo;
     }
 
-    public String getDescripcion() {
-        return descripcion;
-    }
-
-    public void setDescripcion(String descripcion) {
-        this.descripcion = descripcion;
-    }
-
     public List<Ubicacion> getUbicaciones() {
         return ubicaciones;
     }
 
     public void setUbicaciones(List<Ubicacion> ubicaciones) {
         this.ubicaciones = ubicaciones;
-    }
-
-    public Empresa getEmpresa() {
-        return empresa;
-    }
-
-    public void setEmpresa(Empresa empresa) {
-        this.empresa = empresa;
     }
 }

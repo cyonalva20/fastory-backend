@@ -1,11 +1,11 @@
 package com.fastory.fastorybackend.entity;
 
 import jakarta.persistence.*;
-import java.time.LocalDateTime; // <-- Usamos LocalDateTime
+import java.math.BigDecimal;
 
 @Entity
 @Table(name = "detalle_movimiento")
-public class DetalleMovimiento {
+public class DetalleMovimiento extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -20,37 +20,20 @@ public class DetalleMovimiento {
     @JoinColumn(name = "id_producto", nullable = false)
     private Producto producto;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_lote")
+    private Lote lote;
+
     @Column(name = "cantidad", nullable = false)
     private Integer cantidad;
 
-    // --- COLUMNAS PARA EL REGISTRO DE ENTRADA ---
+    @Column(name = "precio_compra", precision = 10, scale = 2)
+    private BigDecimal precioCompra;
 
-    @Column(name = "precio_compra")
-    private Double precioCompra;
+    @Column(name = "precio_venta", precision = 10, scale = 2)
+    private BigDecimal precioVenta;
 
-    @Column(name = "precio_venta")
-    private Double precioVenta;
-
-    @Column(name = "fecha_vencimiento")
-    private LocalDateTime fechaVencimiento; // <-- ¡Cambiado a LocalDateTime!
-
-    @Column(name = "observacion_detalle")
-    private String observacionDetalle;
-
-    // --- NUEVAS COLUMNAS PARA AJUSTES DE INVENTARIO ---
-    @Column(name = "stock_anterior")
-    private Integer stockAnterior;
-
-    @Column(name = "stock_nuevo")
-    private Integer stockNuevo;
-
-    @Column(name = "id_lote")
-    private Integer idLote;
-
-    // -------------------------------------------------------------
-
-    // --- Getters y Setters (Asegúrate de cambiar el tipo en el setter/getter de
-    // fechaVencimiento) ---
+    // --- Getters y Setters ---
 
     public Integer getIdDetalle() {
         return idDetalle;
@@ -76,6 +59,14 @@ public class DetalleMovimiento {
         this.producto = producto;
     }
 
+    public Lote getLote() {
+        return lote;
+    }
+
+    public void setLote(Lote lote) {
+        this.lote = lote;
+    }
+
     public Integer getCantidad() {
         return cantidad;
     }
@@ -84,60 +75,19 @@ public class DetalleMovimiento {
         this.cantidad = cantidad;
     }
 
-    public Double getPrecioCompra() {
+    public BigDecimal getPrecioCompra() {
         return precioCompra;
     }
 
-    public void setPrecioCompra(Double precioCompra) {
+    public void setPrecioCompra(BigDecimal precioCompra) {
         this.precioCompra = precioCompra;
     }
 
-    public Double getPrecioVenta() {
+    public BigDecimal getPrecioVenta() {
         return precioVenta;
     }
 
-    public void setPrecioVenta(Double precioVenta) {
+    public void setPrecioVenta(BigDecimal precioVenta) {
         this.precioVenta = precioVenta;
-    }
-
-    public LocalDateTime getFechaVencimiento() {
-        return fechaVencimiento;
-    } // <-- Tipo LocalDateTime
-
-    public void setFechaVencimiento(LocalDateTime fechaVencimiento) {
-        this.fechaVencimiento = fechaVencimiento;
-    } // <-- Tipo LocalDateTime
-
-    public String getObservacionDetalle() {
-        return observacionDetalle;
-    }
-
-    public void setObservacionDetalle(String observacionDetalle) {
-        this.observacionDetalle = observacionDetalle;
-    }
-
-    public Integer getIdLote() {
-        return idLote;
-    }
-
-    public void setIdLote(Integer idLote) {
-        this.idLote = idLote;
-    }
-
-    // --- NUEVOS GETTERS Y SETTERS ---
-    public Integer getStockAnterior() {
-        return stockAnterior;
-    }
-
-    public void setStockAnterior(Integer stockAnterior) {
-        this.stockAnterior = stockAnterior;
-    }
-
-    public Integer getStockNuevo() {
-        return stockNuevo;
-    }
-
-    public void setStockNuevo(Integer stockNuevo) {
-        this.stockNuevo = stockNuevo;
     }
 }

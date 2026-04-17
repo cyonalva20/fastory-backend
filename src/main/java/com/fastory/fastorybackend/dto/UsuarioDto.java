@@ -1,6 +1,6 @@
 package com.fastory.fastorybackend.dto;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 
 public class UsuarioDto {
     private Integer idUsuario;
@@ -10,11 +10,11 @@ public class UsuarioDto {
     private String nombreRol;
     private String email;
     private Integer idRol;
-    private LocalDateTime fechaIngreso;
+    private OffsetDateTime fechaIngreso;
     private Boolean estado;
 
     public UsuarioDto(Integer idUsuario, String username, String nombre, String apellido, String nombreRol,
-            Integer idRol, LocalDateTime fechaIngreso, Boolean estado, String email) {
+            Integer idRol, OffsetDateTime fechaIngreso, Boolean estado, String email) {
         this.idUsuario = idUsuario;
         this.username = username;
         this.nombre = nombre;
@@ -75,11 +75,11 @@ public class UsuarioDto {
         this.idRol = idRol;
     }
 
-    public LocalDateTime getFechaIngreso() {
+    public OffsetDateTime getFechaIngreso() {
         return fechaIngreso;
     }
 
-    public void setFechaIngreso(LocalDateTime fechaIngreso) {
+    public void setFechaIngreso(OffsetDateTime fechaIngreso) {
         this.fechaIngreso = fechaIngreso;
     }
 

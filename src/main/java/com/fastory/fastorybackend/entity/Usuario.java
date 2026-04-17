@@ -1,23 +1,29 @@
 package com.fastory.fastorybackend.entity;
 
 import jakarta.persistence.*;
-import org.antlr.v4.runtime.misc.NotNull;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.util.UUID;
 
 @Entity
-@Table(name = "Usuario")
-public class Usuario {
+@Table(name = "usuario", uniqueConstraints = {
+        @UniqueConstraint(name = "uq_usuario_tenant", columnNames = {"id_empresa", "username"}),
+        @UniqueConstraint(name = "uq_email_tenant", columnNames = {"id_empresa", "email"})
+})
+public class Usuario extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_usuario")
     private Integer idUsuario;
 
-    @Column(name = "username", nullable = false, unique = true, length = 50)
+    @Column(name = "auth_id", unique = true)
+    private UUID authId;
+
+    @Column(name = "username", nullable = false, length = 255)
     private String username;
 
-    @Column(name = "contraseña", nullable = false, length = 50)
+    @Column(name = "password", length = 255)
     private String password;
 
     @Column(name = "nombre", nullable = false, length = 100)
@@ -26,23 +32,32 @@ public class Usuario {
     @Column(name = "apellido", nullable = false, length = 100)
     private String apellido;
 
-    @Column(name = "fecha_ingreso", nullable = false)
-    @NotNull
-    private LocalDateTime fechaIngreso = LocalDateTime.now();
+    @Column(name = "email", nullable = false, length = 255)
+    private String email;
+
+    @Column(name = "fecha_ingreso", nullable = false, updatable = false)
+    private OffsetDateTime fechaIngreso;
 
     @Column(name = "estado", nullable = false)
     private Boolean estado = true;
 
-    @Column(name = "email", nullable = false, unique = true)
-    private String email;
-
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_rol", nullable = false)
     private Rol rol;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_empresa", nullable = false)
-    private Empresa empresa;
+    @PrePersist
+    @Override
+    protected void onBaseCreate() {
+        super.onBaseCreate();
+        if (fechaIngreso == null) {
+            fechaIngreso = OffsetDateTime.now();
+        }
+    }
+
+    public Usuario() {
+    }
+
+    // --- Getters y Setters ---
 
     public Integer getIdUsuario() {
         return idUsuario;
@@ -50,6 +65,14 @@ public class Usuario {
 
     public void setIdUsuario(Integer idUsuario) {
         this.idUsuario = idUsuario;
+    }
+
+    public UUID getAuthId() {
+        return authId;
+    }
+
+    public void setAuthId(UUID authId) {
+        this.authId = authId;
     }
 
     public String getUsername() {
@@ -84,11 +107,19 @@ public class Usuario {
         this.apellido = apellido;
     }
 
-    public LocalDateTime getFechaIngreso() {
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public OffsetDateTime getFechaIngreso() {
         return fechaIngreso;
     }
 
-    public void setFechaIngreso(LocalDateTime fechaIngreso) {
+    public void setFechaIngreso(OffsetDateTime fechaIngreso) {
         this.fechaIngreso = fechaIngreso;
     }
 
@@ -106,21 +137,5 @@ public class Usuario {
 
     public void setRol(Rol rol) {
         this.rol = rol;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public Empresa getEmpresa() {
-        return empresa;
-    }
-
-    public void setEmpresa(Empresa empresa) {
-        this.empresa = empresa;
     }
 }

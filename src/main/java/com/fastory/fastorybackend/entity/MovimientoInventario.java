@@ -1,12 +1,13 @@
 package com.fastory.fastorybackend.entity;
 
 import jakarta.persistence.*;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 
 @Entity
 @Table(name = "movimiento_inventario")
-public class MovimientoInventario {
+public class MovimientoInventario extends BaseEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_movimiento")
@@ -15,33 +16,30 @@ public class MovimientoInventario {
     @Column(name = "tipo_movimiento", nullable = false, length = 20)
     private String tipoMovimiento;
 
-    @Column(name = "motivo", length = 100)
+    @Column(name = "motivo", length = 255)
     private String motivo;
 
     @Column(name = "fecha_movimiento", nullable = false)
-    private LocalDateTime fechaMovimiento = LocalDateTime.now();
+    private OffsetDateTime fechaMovimiento;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_usuario", nullable = false)
     private Usuario usuario;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_empresa", nullable = false)
-    private Empresa empresa;
-
-    // --- NUEVA RELACIÓN AÑADIDA ---
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_proveedor") // Será null para movimientos de SALIDA
-    private Proveedor proveedor;
-    // ----------------------------
-
     @OneToMany(mappedBy = "movimientoInventario", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<DetalleMovimiento> detalles;
 
-    @OneToMany(mappedBy = "movimientoInventario", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Lote> lotes;
+    @PrePersist
+    @Override
+    protected void onBaseCreate() {
+        super.onBaseCreate();
+        if (fechaMovimiento == null) {
+            fechaMovimiento = OffsetDateTime.now();
+        }
+    }
 
-    // Getters y Setters
+    // --- Getters y Setters ---
+
     public Integer getIdMovimiento() {
         return idMovimiento;
     }
@@ -66,11 +64,11 @@ public class MovimientoInventario {
         this.motivo = motivo;
     }
 
-    public LocalDateTime getFechaMovimiento() {
+    public OffsetDateTime getFechaMovimiento() {
         return fechaMovimiento;
     }
 
-    public void setFechaMovimiento(LocalDateTime fechaMovimiento) {
+    public void setFechaMovimiento(OffsetDateTime fechaMovimiento) {
         this.fechaMovimiento = fechaMovimiento;
     }
 
@@ -89,29 +87,4 @@ public class MovimientoInventario {
     public void setDetalles(List<DetalleMovimiento> detalles) {
         this.detalles = detalles;
     }
-
-    public List<Lote> getLotes() {
-        return lotes;
-    }
-
-    public void setLotes(List<Lote> lotes) {
-        this.lotes = lotes;
-    }
-
-    public Proveedor getProveedor() {
-        return proveedor;
-    }
-
-    public void setProveedor(Proveedor proveedor) {
-        this.proveedor = proveedor;
-    }
-
-    public Empresa getEmpresa() {
-        return empresa;
-    }
-
-    public void setEmpresa(Empresa empresa) {
-        this.empresa = empresa;
-    }
-    // ------------------------------------
 }

@@ -1,8 +1,7 @@
 package com.fastory.fastorybackend.entity;
 
 import jakarta.persistence.*;
-import com.fasterxml.jackson.annotation.JsonFormat;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 
 @Entity
 @Table(name = "empresa")
@@ -22,23 +21,34 @@ public class Empresa {
     @Column(name = "estado_suscripcion", nullable = false, length = 10)
     private String estadoSuscripcion = "PRUEBA";
 
-    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     @Column(name = "fecha_vencimiento")
-    private LocalDateTime fechaVencimiento;
+    private OffsetDateTime fechaVencimiento;
 
-    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     @Column(name = "fecha_registro", nullable = false, updatable = false)
-    private LocalDateTime fechaRegistro;
+    private OffsetDateTime fechaRegistro;
+
+    @Column(name = "updated_at", nullable = false)
+    private OffsetDateTime updatedAt;
 
     @PrePersist
     protected void onCreate() {
         if (fechaRegistro == null) {
-            fechaRegistro = LocalDateTime.now();
+            fechaRegistro = OffsetDateTime.now();
         }
+        if (updatedAt == null) {
+            updatedAt = OffsetDateTime.now();
+        }
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = OffsetDateTime.now();
     }
 
     public Empresa() {
     }
+
+    // --- Getters y Setters ---
 
     public Integer getIdEmpresa() {
         return idEmpresa;
@@ -72,19 +82,27 @@ public class Empresa {
         this.estadoSuscripcion = estadoSuscripcion;
     }
 
-    public LocalDateTime getFechaVencimiento() {
+    public OffsetDateTime getFechaVencimiento() {
         return fechaVencimiento;
     }
 
-    public void setFechaVencimiento(LocalDateTime fechaVencimiento) {
+    public void setFechaVencimiento(OffsetDateTime fechaVencimiento) {
         this.fechaVencimiento = fechaVencimiento;
     }
 
-    public LocalDateTime getFechaRegistro() {
+    public OffsetDateTime getFechaRegistro() {
         return fechaRegistro;
     }
 
-    public void setFechaRegistro(LocalDateTime fechaRegistro) {
+    public void setFechaRegistro(OffsetDateTime fechaRegistro) {
         this.fechaRegistro = fechaRegistro;
+    }
+
+    public OffsetDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(OffsetDateTime updatedAt) {
+        this.updatedAt = updatedAt;
     }
 }

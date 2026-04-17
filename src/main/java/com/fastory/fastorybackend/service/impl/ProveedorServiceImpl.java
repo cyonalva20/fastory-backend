@@ -90,11 +90,8 @@ public class ProveedorServiceImpl implements ProveedorService {
         Proveedor proveedor = proveedorRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Proveedor no encontrado con id: " + id));
 
-        // Validación clave: no eliminar si hay productos asociados
-        if (proveedor.getProductos() != null && !proveedor.getProductos().isEmpty()) {
-            throw new IllegalStateException("No se puede eliminar el proveedor '" + proveedor.getNombreProveedor()
-                    + "' porque tiene productos asociados.");
-        }
+        // Relación Proveedor→Productos eliminada en nuevo esquema.
+        // En el futuro, validar contra devoluciones u otras relaciones.
 
         proveedorRepository.delete(proveedor);
     }
@@ -104,7 +101,7 @@ public class ProveedorServiceImpl implements ProveedorService {
         dto.setIdProveedor(proveedor.getIdProveedor());
         dto.setNombreProveedor(proveedor.getNombreProveedor());
         dto.setTelefono(proveedor.getTelefono());
-        dto.setCantidadProductos(proveedor.getProductos() != null ? proveedor.getProductos().size() : 0);
+        dto.setCantidadProductos(0); // Relación Proveedor→Productos ya no existe
         return dto;
     }
 }

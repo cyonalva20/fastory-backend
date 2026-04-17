@@ -7,27 +7,22 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "categoria")
-public class Categoria {
+@Table(name = "categoria", uniqueConstraints = {
+        @UniqueConstraint(name = "uq_cat_tenant", columnNames = {"id_empresa", "nombre_categoria"})
+})
+public class Categoria extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_categoria")
     private Integer idCategoria;
 
-    @Column(name = "nombre_categoria", nullable = false, unique = true, length = 100)
+    @Column(name = "nombre_categoria", nullable = false, length = 100)
     private String nombreCategoria;
-
-    @Column(name = "descripcion")
-    private String descripcion;
 
     @OneToMany(mappedBy = "categoria", cascade = CascadeType.ALL)
     @JsonIgnore
     private List<Producto> productos = new ArrayList<>();
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_empresa", nullable = false)
-    private Empresa empresa;
 
     public Categoria() {
     }
@@ -35,6 +30,8 @@ public class Categoria {
     public Categoria(String nombreCategoria) {
         this.nombreCategoria = nombreCategoria;
     }
+
+    // --- Getters y Setters ---
 
     public Integer getIdCategoria() {
         return idCategoria;
@@ -52,27 +49,11 @@ public class Categoria {
         this.nombreCategoria = nombreCategoria;
     }
 
-    public String getDescripcion() {
-        return descripcion;
-    }
-
-    public void setDescripcion(String descripcion) {
-        this.descripcion = descripcion;
-    }
-
     public List<Producto> getProductos() {
         return productos;
     }
 
     public void setProductos(List<Producto> productos) {
         this.productos = productos;
-    }
-
-    public Empresa getEmpresa() {
-        return empresa;
-    }
-
-    public void setEmpresa(Empresa empresa) {
-        this.empresa = empresa;
     }
 }

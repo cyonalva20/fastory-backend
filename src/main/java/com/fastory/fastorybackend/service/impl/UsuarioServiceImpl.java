@@ -13,7 +13,7 @@ import com.fastory.fastorybackend.repository.RolRepository;
 import com.fastory.fastorybackend.repository.UsuarioRepository;
 import com.fastory.fastorybackend.service.UsuarioService;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -34,7 +34,7 @@ public class UsuarioServiceImpl implements UsuarioService {
             throw new IllegalArgumentException("El usuario ya existe");
         }
         if (usuario.getFechaIngreso() == null) {
-            usuario.setFechaIngreso(LocalDateTime.now());
+            usuario.setFechaIngreso(OffsetDateTime.now());
         }
         if (usuario.getEstado() == null) {
             usuario.setEstado(true);
@@ -60,7 +60,7 @@ public class UsuarioServiceImpl implements UsuarioService {
         usuario.setUsername(request.getUsername());
         usuario.setPassword(passwordEncoder.encode(request.getPassword()));
         usuario.setRol(rol);
-        usuario.setFechaIngreso(LocalDateTime.now());
+        usuario.setFechaIngreso(OffsetDateTime.now());
         usuario.setEstado(true);
         usuario.setEmail(request.getEmail());
 

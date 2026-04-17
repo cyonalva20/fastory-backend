@@ -12,16 +12,15 @@ import com.fastory.fastorybackend.dto.ProductoInventarioDto;
 import com.fastory.fastorybackend.dto.ProductoUpdateDto;
 import com.fastory.fastorybackend.entity.Categoria;
 import com.fastory.fastorybackend.entity.Producto;
-import com.fastory.fastorybackend.entity.Proveedor;
 import com.fastory.fastorybackend.entity.Ubicacion;
 import com.fastory.fastorybackend.exception.ResourceNotFoundException;
 import com.fastory.fastorybackend.exception.UbicacionOcupadaException;
 import com.fastory.fastorybackend.service.ProductoService;
 
-import org.springframework.security.access.AccessDeniedException; // <-- AÑADIDO
-import org.springframework.security.core.Authentication; // <-- AÑADIDO
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.Authentication;
 
-import java.time.LocalDateTime;
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,15 +36,6 @@ public class ProductoController {
     @PostMapping("/registrar")
     public ResponseEntity<Object> registrarProducto(@Valid @RequestBody ProductoDTO productoDTO) {
         try {
-            // Validación manual: fecha de vencimiento
-            if (productoDTO.isPerecible()) {
-                if (productoDTO.getFechaVencimiento() == null ||
-                        productoDTO.getFechaVencimiento().isBefore(LocalDateTime.now())) {
-                    return ResponseEntity.badRequest()
-                            .body("Debe ingresar una fecha de vencimiento válida");
-                }
-            }
-
             // Validación de duplicado
             boolean existe = productoService.existePorNombre(productoDTO.getNombreProducto());
             if (existe) {
@@ -60,37 +50,31 @@ public class ProductoController {
             // Mapeo manual del DTO → Entidad
             Producto producto = new Producto();
             producto.setNombreProducto(productoDTO.getNombreProducto());
-            producto.setDescripcionProducto(productoDTO.getDescripcion());
+            // descripcionProducto eliminada del esquema
             producto.setUnidadMedida(productoDTO.getUnidadMedida());
-            producto.setPrecioCompra(productoDTO.getPrecioCompra());
-            producto.setPrecioVenta(productoDTO.getPrecioVenta());
+            producto.setPrecioCompra(BigDecimal.valueOf(productoDTO.getPrecioCompra()));
+            producto.setPrecioVenta(BigDecimal.valueOf(productoDTO.getPrecioVenta()));
             producto.setStock(productoDTO.getStock() != null ? productoDTO.getStock() : 0);
             producto.setStockMinimo(productoDTO.getStockMinimo());
-            producto.setPerecible(productoDTO.isPerecible());
-            producto.setFechaVencimiento(productoDTO.getFechaVencimiento());
-            producto.setMarca(productoDTO.getMarca());
+            producto.setEsPerecible(productoDTO.isPerecible());
+            // fechaVencimiento se maneja a nivel de lote, no de producto
+            // marca eliminada del esquema
 
-            // 🔹 Set categoría y ubicación (solo IDs por ahora)
+            // Set categoría (solo ID)
             Categoria categoria = new Categoria();
             categoria.setIdCategoria(productoDTO.getIdCategoria());
             producto.setCategoria(categoria);
-            Proveedor proveedor = new Proveedor();
-            proveedor.setIdProveedor(productoDTO.getIdProveedor());
-            producto.setProveedor(proveedor);
+            // Proveedor eliminado de Producto en el nuevo esquema
 
-            // ...
-            // 🔹 Asignar la ubicación seleccionada desde el frontend
+            // Asignar ubicación
             if (productoDTO.getIdUbicacion() != null) {
                 Ubicacion ubicacion = new Ubicacion();
-                // Usamos el ID que viene en el payload
                 ubicacion.setIdUbicacion(productoDTO.getIdUbicacion());
                 producto.setUbicacion(ubicacion);
             } else {
-                // Si la ubicación es obligatoria, puedes lanzar un error aquí
                 return ResponseEntity.badRequest().body("Debe seleccionar una ubicación para el producto");
             }
-            // ...
-            // 🔹 Guardar producto
+
             productoService.guardar(producto);
             return ResponseEntity.status(HttpStatus.CREATED)
                     .body("Producto registrado correctamente");
@@ -101,14 +85,8 @@ public class ProductoController {
         }
     }
 
-    // --- NUEVOS ENDPOINTS PARA EL PANEL PRINCIPAL (Index.tsx) ---
+    // --- ENDPOINTS PARA EL PANEL PRINCIPAL (Index.tsx) ---
 
-    /**
-     * Endpoint para obtener la lista filtrada y ordenada de productos para la tabla
-     * principal.
-     * GET
-     * /api/v1/productos/inventario?nombre=...&categoriaId=...&repisa=...&fila=...&columna=...&sortBy=...&sortDir=...
-     */
     @GetMapping("/inventario")
     public ResponseEntity<List<ProductoInventarioDto>> getInventario(
             @RequestParam(required = false) String nombre,
@@ -123,42 +101,24 @@ public class ProductoController {
         return ResponseEntity.ok(productos);
     }
 
-    /**
-     * Endpoint para obtener alertas de stock bajo.
-     * GET /api/productos/alertas
-     */
     @GetMapping("/alertas")
     public ResponseEntity<List<ProductoInventarioDto>> getAlertasStock() {
         List<ProductoInventarioDto> alertas = productoService.obtenerAlertasStock();
         return ResponseEntity.ok(alertas);
     }
 
-    /**
-     * Endpoint para obtener los datos para poblar los filtros (categorías y
-     * repisas).
-     * GET /api/v1/productos/filtros
-     */
     @GetMapping("/filtros")
     public ResponseEntity<FiltrosDto> getFiltrosInventario() {
         FiltrosDto filtros = productoService.getFiltrosInventario();
         return ResponseEntity.ok(filtros);
     }
 
-    /**
-     * Endpoint para obtener los detalles de un solo producto (para el modal).
-     * GET /api/v1/productos/detalles/{id}
-     */
     @GetMapping("/detalles/{id}")
     public ResponseEntity<ProductoDetalleDto> getProductoDetalle(@PathVariable Integer id) {
         ProductoDetalleDto detalle = productoService.getProductoDetalle(id);
         return ResponseEntity.ok(detalle);
     }
 
-    /**
-     * Endpoint para actualizar parcialmente un producto (Nombre, Desc, Cat, Precio,
-     * StockMin).
-     * PUT /api/v1/productos/actualizar/{id}
-     */
     @PutMapping("/actualizar/{id}")
     public ResponseEntity<Object> actualizarProducto(
             @PathVariable Integer id,
@@ -179,8 +139,7 @@ public class ProductoController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
-        } catch (UbicacionOcupadaException e) { // --- NUEVO CATCH ---
-            // Devolver JSON con información del producto que ocupa la ubicación
+        } catch (UbicacionOcupadaException e) {
             Map<String, Object> errorResponse = new HashMap<>();
             errorResponse.put("error", "UBICACION_OCUPADA");
             errorResponse.put("message", e.getMessage());
