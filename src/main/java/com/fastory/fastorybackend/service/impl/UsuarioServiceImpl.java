@@ -60,12 +60,13 @@ public class UsuarioServiceImpl implements UsuarioService {
 
         // Crear la empresa
         Empresa empresa = new Empresa();
-        empresa.setNombreEmpresa(request.getNombreEmpresa());
-        empresa.setEstado("PRUEBA");
+        empresa.setNombreComercial(request.getNombreEmpresa());
+        empresa.setEstadoSuscripcion("PRUEBA");
         // No se mapea RUC/direccion porque el request basico podria no tenerlos
         Empresa empresaGuardada = empresaRepository.save(empresa);
 
-        // Buscar rol administrador (asumiendo que existe en la BD o se crea un ID por defecto, p.ej. idRol = 1 o nombre = 'ADMINISTRADOR')
+        // Buscar rol administrador (asumiendo que existe en la BD o se crea un ID por
+        // defecto, p.ej. idRol = 1 o nombre = 'ADMINISTRADOR')
         Rol rolAdmin = rolRepository.findByNombreRol("ADMINISTRADOR")
                 .orElseThrow(() -> new ResourceNotFoundException("Rol ADMINISTRADOR no encontrado en el sistema"));
 

@@ -53,21 +53,21 @@ public class AuthController {
             Usuario usuario = usuarioRepository.findByUsername(request.getUsername())
                     .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado"));
 
-            String token = jwtUtil.generarToken(usuario.getUsername(), usuario.getRol().getNombreRol(), usuario.getEmpresa().getIdEmpresa());
+            String token = jwtUtil.generarToken(usuario.getUsername(), usuario.getRol().getNombreRol(),
+                    usuario.getEmpresa().getIdEmpresa());
 
             LoginResponse response = new LoginResponse(
                     "Inicio de sesión correcto",
                     usuario.getRol().getNombreRol(),
                     token,
                     usuario.getIdUsuario(),
-                    usuario.getEmpresa().getIdEmpresa()
-            );
+                    usuario.getEmpresa().getIdEmpresa());
 
             return ResponseEntity.ok(response);
 
         } catch (Exception e) {
             return ResponseEntity.status(401).body(
-                    new LoginResponse("Credenciales inválidas", null, null, null));
+                    new LoginResponse("Credenciales inválidas", null, null, null, null));
         }
     }
 
