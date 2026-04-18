@@ -1,13 +1,13 @@
 package com.fastory.fastorybackend.entity;
 
 import jakarta.persistence.*;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
+import org.hibernate.annotations.Filter;
+import java.time.OffsetDateTime;
 
 @Entity
 @Table(name = "devolucion")
-public class Devolucion {
+@Filter(name = "tenantFilter", condition = "id_empresa = :empresaId")
+public class Devolucion extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,32 +22,36 @@ public class Devolucion {
     @JoinColumn(name = "id_proveedor", nullable = false)
     private Proveedor proveedor;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_empresa", nullable = false)
-    private Empresa empresa;
-
-    // Guardamos el código del lote vencido como referencia histórica
-    // No relacionamos directamente la entidad Lote porque el lote podría ser
-    // eliminado o vaciado
-    @Column(name = "codigo_lote_vencido")
-    private String codigoLoteVencido;
-
     @Column(name = "cantidad", nullable = false)
     private Integer cantidad;
 
-    @Column(name = "fecha_solicitud", nullable = false)
-    private LocalDateTime fechaSolicitud = LocalDateTime.now();
+    @Column(name = "motivo", columnDefinition = "TEXT")
+    private String motivo;
 
-    @Column(name = "fecha_recepcion_programada", nullable = false)
-    private LocalDate fechaRecepcionProgramada;
+    @Column(name = "estado", nullable = false, length = 20)
+    private String estado = "PENDIENTE";
 
-    @Column(name = "hora_recepcion_programada", nullable = false)
-    private LocalTime horaRecepcionProgramada;
+    @Column(name = "fecha_solicitud")
+    private OffsetDateTime fechaSolicitud;
 
-    @Column(name = "estado", nullable = false) // PENDIENTE, COMPLETADA
-    private String estado;
+    @Column(name = "fecha_entrega")
+    private OffsetDateTime fechaEntrega;
 
-    // Getters y Setters
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_movimiento_ref")
+    private MovimientoInventario movimientoRef;
+
+    @PrePersist
+    @Override
+    protected void onBaseCreate() {
+        super.onBaseCreate();
+        if (fechaSolicitud == null) {
+            fechaSolicitud = OffsetDateTime.now();
+        }
+    }
+
+    // --- Getters y Setters ---
+
     public Integer getIdDevolucion() {
         return idDevolucion;
     }
@@ -72,14 +76,6 @@ public class Devolucion {
         this.proveedor = proveedor;
     }
 
-    public String getCodigoLoteVencido() {
-        return codigoLoteVencido;
-    }
-
-    public void setCodigoLoteVencido(String codigoLoteVencido) {
-        this.codigoLoteVencido = codigoLoteVencido;
-    }
-
     public Integer getCantidad() {
         return cantidad;
     }
@@ -88,28 +84,12 @@ public class Devolucion {
         this.cantidad = cantidad;
     }
 
-    public LocalDateTime getFechaSolicitud() {
-        return fechaSolicitud;
+    public String getMotivo() {
+        return motivo;
     }
 
-    public void setFechaSolicitud(LocalDateTime fechaSolicitud) {
-        this.fechaSolicitud = fechaSolicitud;
-    }
-
-    public LocalDate getFechaRecepcionProgramada() {
-        return fechaRecepcionProgramada;
-    }
-
-    public void setFechaRecepcionProgramada(LocalDate fechaRecepcionProgramada) {
-        this.fechaRecepcionProgramada = fechaRecepcionProgramada;
-    }
-
-    public LocalTime getHoraRecepcionProgramada() {
-        return horaRecepcionProgramada;
-    }
-
-    public void setHoraRecepcionProgramada(LocalTime horaRecepcionProgramada) {
-        this.horaRecepcionProgramada = horaRecepcionProgramada;
+    public void setMotivo(String motivo) {
+        this.motivo = motivo;
     }
 
     public String getEstado() {
@@ -120,11 +100,27 @@ public class Devolucion {
         this.estado = estado;
     }
 
-    public Empresa getEmpresa() {
-        return empresa;
+    public OffsetDateTime getFechaSolicitud() {
+        return fechaSolicitud;
     }
 
-    public void setEmpresa(Empresa empresa) {
-        this.empresa = empresa;
+    public void setFechaSolicitud(OffsetDateTime fechaSolicitud) {
+        this.fechaSolicitud = fechaSolicitud;
+    }
+
+    public OffsetDateTime getFechaEntrega() {
+        return fechaEntrega;
+    }
+
+    public void setFechaEntrega(OffsetDateTime fechaEntrega) {
+        this.fechaEntrega = fechaEntrega;
+    }
+
+    public MovimientoInventario getMovimientoRef() {
+        return movimientoRef;
+    }
+
+    public void setMovimientoRef(MovimientoInventario movimientoRef) {
+        this.movimientoRef = movimientoRef;
     }
 }

@@ -23,10 +23,15 @@ public class JwtUtil {
         return Keys.hmacShaKeyFor(SECRET_KEY.getBytes());
     }
 
-    public String generarToken(String username, String rol) {
+    /**
+     * Genera un JWT que incluye username, rol e idEmpresa como claims.
+     * El idEmpresa es esencial para el filtro de tenant en cada request.
+     */
+    public String generarToken(String username, String rol, Integer idEmpresa) {
         return Jwts.builder()
                 .setSubject(username)
                 .claim("rol", rol)
+                .claim("idEmpresa", idEmpresa)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)
@@ -43,6 +48,24 @@ public class JwtUtil {
                     .getSubject();
         } catch (JwtException e) {
             logger.error("Error al obtener username del token: " + e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * Extrae el idEmpresa (tenant) del token JWT.
+     * Retorna null si el token no contiene el claim o es inválido.
+     */
+    public Integer obtenerIdEmpresa(String token) {
+        try {
+            Claims claims = Jwts.parserBuilder()
+                    .setSigningKey(getSigningKey())
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
+            return claims.get("idEmpresa", Integer.class);
+        } catch (JwtException e) {
+            logger.error("Error al obtener idEmpresa del token: " + e.getMessage());
             return null;
         }
     }

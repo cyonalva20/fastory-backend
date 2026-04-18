@@ -16,29 +16,18 @@ public class ProductoSpecification {
             if (categoriaId == null) {
                 return criteriaBuilder.conjunction();
             }
-            // Navega de Producto a Categoria
             Join<Producto, Categoria> categoriaJoin = root.join("categoria", JoinType.INNER);
             return criteriaBuilder.equal(categoriaJoin.get("idCategoria"), categoriaId);
         };
     }
 
-    // 2. Filtro por Marca (usa el String directo de la entidad Producto)
-    public static Specification<Producto> hasMarca(String marca) {
-        return (root, query, criteriaBuilder) -> {
-            if (marca == null || marca.trim().isEmpty()) {
-                return criteriaBuilder.conjunction();
-            }
-            // Usa LIKE para búsqueda parcial e IGNORA mayúsculas/minúsculas
-            return criteriaBuilder.like(criteriaBuilder.lower(root.get("marca")), "%" + marca.toLowerCase() + "%");
-        };
-    }
+    // 2. Filtro por Marca - ELIMINADO (campo 'marca' ya no existe en Producto)
+    // hasMarca() removido del nuevo esquema
 
     // 3. Filtro por Stock Bajo Mínimo (Stock < StockMínimo)
     public static Specification<Producto> isStockBajoMinimo() {
         return (root, query, criteriaBuilder) -> criteriaBuilder.lessThan(root.get("stock"), root.get("stockMinimo"));
     }
-
-    // --- NUEVAS ESPECIFICACIONES PARA Index.tsx ---
 
     /**
      * Filtra por nombre del producto (ignorando mayúsculas/minúsculas).
@@ -46,7 +35,7 @@ public class ProductoSpecification {
     public static Specification<Producto> hasNombre(String nombre) {
         return (root, query, criteriaBuilder) -> {
             if (nombre == null || nombre.trim().isEmpty()) {
-                return criteriaBuilder.conjunction(); // No aplicar filtro si está vacío
+                return criteriaBuilder.conjunction();
             }
             return criteriaBuilder.like(criteriaBuilder.lower(root.get("nombreProducto")),
                     "%" + nombre.toLowerCase() + "%");

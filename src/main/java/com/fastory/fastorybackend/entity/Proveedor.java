@@ -1,13 +1,12 @@
 package com.fastory.fastorybackend.entity;
 
 import jakarta.persistence.*;
-
-import java.util.ArrayList;
-import java.util.List;
+import org.hibernate.annotations.Filter;
 
 @Entity
 @Table(name = "proveedor")
-public class Proveedor {
+@Filter(name = "tenantFilter", condition = "id_empresa = :empresaId")
+public class Proveedor extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -17,20 +16,17 @@ public class Proveedor {
     @Column(name = "nombre_proveedor", nullable = false, length = 150)
     private String nombreProveedor;
 
-    @Column(length = 9)
+    @Column(name = "ruc_proveedor", length = 11)
+    private String rucProveedor;
+
+    @Column(name = "telefono", length = 15)
     private String telefono;
-
-    @OneToMany(mappedBy = "proveedor", cascade = CascadeType.ALL)
-    private List<Producto> productos = new ArrayList<>();
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_empresa", nullable = false)
-    private Empresa empresa;
 
     public Proveedor() {
     }
 
-    // Getters y setters
+    // --- Getters y Setters ---
+
     public Integer getIdProveedor() {
         return idProveedor;
     }
@@ -47,27 +43,19 @@ public class Proveedor {
         this.nombreProveedor = nombreProveedor;
     }
 
+    public String getRucProveedor() {
+        return rucProveedor;
+    }
+
+    public void setRucProveedor(String rucProveedor) {
+        this.rucProveedor = rucProveedor;
+    }
+
     public String getTelefono() {
         return telefono;
     }
 
     public void setTelefono(String telefono) {
         this.telefono = telefono;
-    }
-
-    public List<Producto> getProductos() {
-        return productos;
-    }
-
-    public void setProductos(List<Producto> productos) {
-        this.productos = productos;
-    }
-
-    public Empresa getEmpresa() {
-        return empresa;
-    }
-
-    public void setEmpresa(Empresa empresa) {
-        this.empresa = empresa;
     }
 }
