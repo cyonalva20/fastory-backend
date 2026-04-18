@@ -13,12 +13,15 @@ import com.fastory.fastorybackend.dto.ProductoUpdateDto;
 import com.fastory.fastorybackend.entity.Categoria;
 import com.fastory.fastorybackend.entity.Producto;
 import com.fastory.fastorybackend.entity.Ubicacion;
+import com.fastory.fastorybackend.entity.Empresa;
 import com.fastory.fastorybackend.exception.ResourceNotFoundException;
 import com.fastory.fastorybackend.exception.UbicacionOcupadaException;
 import com.fastory.fastorybackend.service.ProductoService;
 
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
+import com.fastory.fastorybackend.config.TenantUserDetails;
+import com.fastory.fastorybackend.repository.EmpresaRepository;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
@@ -32,9 +35,10 @@ import java.util.Map;
 public class ProductoController {
 
     private final ProductoService productoService;
+    private final EmpresaRepository empresaRepository;
 
     @PostMapping("/registrar")
-    public ResponseEntity<Object> registrarProducto(@Valid @RequestBody ProductoDTO productoDTO) {
+    public ResponseEntity<Object> registrarProducto(@Valid @RequestBody ProductoDTO productoDTO, Authentication authentication) {
         try {
             // Validación de duplicado
             boolean existe = productoService.existePorNombre(productoDTO.getNombreProducto());
@@ -74,6 +78,11 @@ public class ProductoController {
             } else {
                 return ResponseEntity.badRequest().body("Debe seleccionar una ubicación para el producto");
             }
+
+            TenantUserDetails userDetails = (TenantUserDetails) authentication.getPrincipal();
+            Empresa empresa = empresaRepository.findById(userDetails.getIdEmpresa())
+                    .orElseThrow(() -> new RuntimeException("Empresa no encontrada"));
+            producto.setEmpresa(empresa);
 
             productoService.guardar(producto);
             return ResponseEntity.status(HttpStatus.CREATED)

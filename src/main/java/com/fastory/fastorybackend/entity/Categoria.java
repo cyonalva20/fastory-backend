@@ -2,6 +2,7 @@ package com.fastory.fastorybackend.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import org.hibernate.annotations.Filter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,6 +11,7 @@ import java.util.List;
 @Table(name = "categoria", uniqueConstraints = {
         @UniqueConstraint(name = "uq_cat_tenant", columnNames = {"id_empresa", "nombre_categoria"})
 })
+@Filter(name = "tenantFilter", condition = "id_empresa = :empresaId")
 public class Categoria extends BaseEntity {
 
     @Id

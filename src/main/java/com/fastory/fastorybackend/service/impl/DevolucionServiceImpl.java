@@ -54,6 +54,7 @@ public class DevolucionServiceImpl {
         devolucion.setCantidad(dto.getCantidad());
         devolucion.setMotivo("Devolución de lote: " + lote.getCodigoLote());
         devolucion.setEstado("PENDIENTE");
+        devolucion.setEmpresa(producto.getEmpresa());
 
         devolucionRepository.save(devolucion);
     }

@@ -1,6 +1,7 @@
 package com.fastory.fastorybackend.entity;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.Filter;
 
 import java.time.OffsetDateTime;
 import java.util.UUID;
@@ -10,6 +11,7 @@ import java.util.UUID;
         @UniqueConstraint(name = "uq_usuario_tenant", columnNames = {"id_empresa", "username"}),
         @UniqueConstraint(name = "uq_email_tenant", columnNames = {"id_empresa", "email"})
 })
+@Filter(name = "tenantFilter", condition = "id_empresa = :empresaId")
 public class Usuario extends BaseEntity {
 
     @Id

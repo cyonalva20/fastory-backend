@@ -1,11 +1,13 @@
 package com.fastory.fastorybackend.entity;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.Filter;
 
 @Entity
 @Table(name = "ubicacion", uniqueConstraints = {
         @UniqueConstraint(name = "uq_ubicacion_tenant", columnNames = {"id_repisa", "fila", "columna"})
 })
+@Filter(name = "tenantFilter", condition = "id_empresa = :empresaId")
 public class Ubicacion extends BaseEntity {
 
     @Id

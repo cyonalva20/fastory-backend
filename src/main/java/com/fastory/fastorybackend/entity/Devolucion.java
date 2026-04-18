@@ -1,10 +1,12 @@
 package com.fastory.fastorybackend.entity;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.Filter;
 import java.time.OffsetDateTime;
 
 @Entity
 @Table(name = "devolucion")
+@Filter(name = "tenantFilter", condition = "id_empresa = :empresaId")
 public class Devolucion extends BaseEntity {
 
     @Id

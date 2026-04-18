@@ -2,12 +2,14 @@ package com.fastory.fastorybackend.entity;
 
 import jakarta.persistence.*;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.hibernate.annotations.Filter;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Table(name = "producto")
+@Filter(name = "tenantFilter", condition = "id_empresa = :empresaId")
 public class Producto extends BaseEntity {
 
     @Id

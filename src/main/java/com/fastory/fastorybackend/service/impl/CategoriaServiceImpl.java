@@ -3,11 +3,15 @@ package com.fastory.fastorybackend.service.impl;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import org.springframework.security.core.context.SecurityContextHolder;
+import com.fastory.fastorybackend.config.TenantUserDetails;
 import com.fastory.fastorybackend.dto.CategoriaCreateDto;
 import com.fastory.fastorybackend.dto.CategoriaDto;
 import com.fastory.fastorybackend.entity.Categoria;
+import com.fastory.fastorybackend.entity.Empresa;
 import com.fastory.fastorybackend.exception.ResourceNotFoundException;
 import com.fastory.fastorybackend.repository.CategoriaRepository;
+import com.fastory.fastorybackend.repository.EmpresaRepository;
 import com.fastory.fastorybackend.service.CategoriaService;
 
 import java.util.List;
@@ -18,6 +22,8 @@ import java.util.stream.Collectors;
 public class CategoriaServiceImpl implements CategoriaService {
 
     private final CategoriaRepository categoriaRepository;
+
+    private final EmpresaRepository empresaRepository;
 
     @Override
     @Transactional(readOnly = true)
@@ -43,6 +49,14 @@ public class CategoriaServiceImpl implements CategoriaService {
 
         Categoria nuevaCategoria = new Categoria();
         nuevaCategoria.setNombreCategoria(createDto.getNombreCategoria());
+        
+        TenantUserDetails userDetails = (TenantUserDetails) SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getPrincipal();
+        Empresa empresa = empresaRepository.findById(userDetails.getIdEmpresa())
+                .orElseThrow(() -> new RuntimeException("Empresa no encontrada"));
+        nuevaCategoria.setEmpresa(empresa);
         // Campo 'descripcion' eliminado de la entidad Categoria en el nuevo esquema
 
         Categoria categoriaGuardada = categoriaRepository.save(nuevaCategoria);

@@ -3,11 +3,15 @@ package com.fastory.fastorybackend.service.impl;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import org.springframework.security.core.context.SecurityContextHolder;
+import com.fastory.fastorybackend.config.TenantUserDetails;
 import com.fastory.fastorybackend.dto.ProveedorCreateDto;
 import com.fastory.fastorybackend.dto.ProveedorDto;
 import com.fastory.fastorybackend.entity.Proveedor;
+import com.fastory.fastorybackend.entity.Empresa;
 import com.fastory.fastorybackend.exception.ResourceNotFoundException;
 import com.fastory.fastorybackend.repository.ProveedorRepository;
+import com.fastory.fastorybackend.repository.EmpresaRepository;
 import com.fastory.fastorybackend.service.ProveedorService;
 
 import java.util.List;
@@ -18,6 +22,8 @@ import java.util.stream.Collectors;
 public class ProveedorServiceImpl implements ProveedorService {
 
     private final ProveedorRepository proveedorRepository;
+
+    private final EmpresaRepository empresaRepository;
 
     @Override
     @Transactional(readOnly = true)
@@ -47,6 +53,14 @@ public class ProveedorServiceImpl implements ProveedorService {
         Proveedor nuevoProveedor = new Proveedor();
         nuevoProveedor.setNombreProveedor(createDto.getNombreProveedor());
         nuevoProveedor.setTelefono(createDto.getTelefono());
+
+        TenantUserDetails userDetails = (TenantUserDetails) SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getPrincipal();
+        Empresa empresa = empresaRepository.findById(userDetails.getIdEmpresa())
+                .orElseThrow(() -> new RuntimeException("Empresa no encontrada"));
+        nuevoProveedor.setEmpresa(empresa);
 
         Proveedor proveedorGuardado = proveedorRepository.save(nuevoProveedor);
 

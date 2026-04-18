@@ -88,7 +88,7 @@ public class ProductoServiceImpl implements ProductoService {
             lote.setProducto(productoGuardado);
             lote.setCodigoLote("L" + productoGuardado.getIdProducto() + "-" + System.currentTimeMillis());
             lote.setCantidad(productoGuardado.getStock());
-            lote.setIdEmpresa(productoGuardado.getIdEmpresa());
+            lote.setEmpresa(productoGuardado.getEmpresa());
             // fechaVencimiento ya no está en Producto — se maneja a nivel de lote
             loteRepository.save(lote);
         }

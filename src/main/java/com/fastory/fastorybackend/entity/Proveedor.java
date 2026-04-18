@@ -1,9 +1,11 @@
 package com.fastory.fastorybackend.entity;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.Filter;
 
 @Entity
 @Table(name = "proveedor")
+@Filter(name = "tenantFilter", condition = "id_empresa = :empresaId")
 public class Proveedor extends BaseEntity {
 
     @Id

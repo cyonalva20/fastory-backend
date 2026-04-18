@@ -1,18 +1,26 @@
 package com.fastory.fastorybackend.entity;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.FilterDef;
+import org.hibernate.annotations.ParamDef;
+
 import java.time.OffsetDateTime;
 
 /**
  * Superclase mapeada para todas las entidades multi-tenant.
- * Contiene el identificador de tenant (id_empresa) y la marca de auditoría (updated_at).
+ * Contiene la relación con Empresa (tenant) y la marca de auditoría (updated_at).
  * Todas las entidades excepto Empresa y Rol deben heredar de esta clase.
+ *
+ * @FilterDef declarado aquí para que esté disponible globalmente.
+ * La activación del filtro se realiza en el interceptor AOP de cada request.
  */
 @MappedSuperclass
+@FilterDef(name = "tenantFilter", parameters = @ParamDef(name = "empresaId", type = Integer.class))
 public abstract class BaseEntity {
 
-    @Column(name = "id_empresa", nullable = false)
-    private Integer idEmpresa;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_empresa", nullable = false)
+    private Empresa empresa;
 
     @Column(name = "updated_at", nullable = false)
     private OffsetDateTime updatedAt;
@@ -31,12 +39,20 @@ public abstract class BaseEntity {
 
     // --- Getters y Setters ---
 
-    public Integer getIdEmpresa() {
-        return idEmpresa;
+    public Empresa getEmpresa() {
+        return empresa;
     }
 
-    public void setIdEmpresa(Integer idEmpresa) {
-        this.idEmpresa = idEmpresa;
+    public void setEmpresa(Empresa empresa) {
+        this.empresa = empresa;
+    }
+
+    /**
+     * Helper de conveniencia — devuelve el ID de la empresa sin forzar carga completa.
+     * REGLA DE ORO: No eliminar hasta que todos los servicios migren a getEmpresa().
+     */
+    public Integer getIdEmpresa() {
+        return empresa != null ? empresa.getIdEmpresa() : null;
     }
 
     public OffsetDateTime getUpdatedAt() {

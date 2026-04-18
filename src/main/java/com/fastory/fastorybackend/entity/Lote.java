@@ -1,12 +1,14 @@
 package com.fastory.fastorybackend.entity;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.Filter;
 import java.time.OffsetDateTime;
 
 @Entity
 @Table(name = "lote", uniqueConstraints = {
         @UniqueConstraint(name = "uq_lote_tenant", columnNames = {"id_empresa", "codigo_lote"})
 })
+@Filter(name = "tenantFilter", condition = "id_empresa = :empresaId")
 public class Lote extends BaseEntity {
 
     @Id

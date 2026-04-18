@@ -71,7 +71,7 @@ public class MovimientoServiceImpl implements MovimientoService {
         MovimientoInventario movimiento = new MovimientoInventario();
         movimiento.setTipoMovimiento("SALIDA");
         movimiento.setUsuario(usuario);
-        movimiento.setIdEmpresa(usuario.getIdEmpresa());
+        movimiento.setEmpresa(usuario.getEmpresa());
 
         String motivoFinal = "otro".equalsIgnoreCase(salidaDto.getMotivo()) ? salidaDto.getObservacion()
                 : salidaDto.getMotivo();
@@ -109,7 +109,7 @@ public class MovimientoServiceImpl implements MovimientoService {
             detalleMovimiento.setProducto(producto);
             detalleMovimiento.setCantidad(detalleDto.getCantidad());
             detalleMovimiento.setPrecioVenta(producto.getPrecioVenta() != null ? producto.getPrecioVenta() : BigDecimal.ZERO);
-            detalleMovimiento.setIdEmpresa(usuario.getIdEmpresa());
+            detalleMovimiento.setEmpresa(usuario.getEmpresa());
             detallesAGuardar.add(detalleMovimiento);
         }
         movimientoGuardado.setDetalles(detallesAGuardar);
@@ -144,7 +144,7 @@ public class MovimientoServiceImpl implements MovimientoService {
         MovimientoInventario movimiento = new MovimientoInventario();
         movimiento.setTipoMovimiento("ENTRADA");
         movimiento.setUsuario(usuario);
-        movimiento.setIdEmpresa(usuario.getIdEmpresa());
+        movimiento.setEmpresa(usuario.getEmpresa());
         movimiento.setMotivo("Entrada de proveedor: " + proveedor.getNombreProveedor());
         movimiento.setFechaMovimiento(
                 entradaDto.getFechaEntrada() != null
@@ -178,7 +178,7 @@ public class MovimientoServiceImpl implements MovimientoService {
                             ? detalleDto.getFechaVencimiento().atOffset(ZoneOffset.UTC)
                             : null);
             nuevoLote.setCodigoLote("LOTE-" + producto.getIdProducto() + "-" + System.currentTimeMillis());
-            nuevoLote.setIdEmpresa(usuario.getIdEmpresa());
+            nuevoLote.setEmpresa(usuario.getEmpresa());
 
             Lote loteGuardado = loteRepository.save(nuevoLote);
 
@@ -188,7 +188,7 @@ public class MovimientoServiceImpl implements MovimientoService {
             detalleMovimiento.setProducto(producto);
             detalleMovimiento.setCantidad(detalleDto.getCantidad());
             detalleMovimiento.setLote(loteGuardado);
-            detalleMovimiento.setIdEmpresa(usuario.getIdEmpresa());
+            detalleMovimiento.setEmpresa(usuario.getEmpresa());
 
             detalleMovimiento.setPrecioCompra(
                     detalleDto.getPrecioCompra() != null ? BigDecimal.valueOf(detalleDto.getPrecioCompra()) : BigDecimal.ZERO);
@@ -349,7 +349,7 @@ public class MovimientoServiceImpl implements MovimientoService {
             nuevoDetalle.setCantidad(detDto.getCantidad());
             nuevoDetalle.setPrecioVenta(producto.getPrecioVenta());
             nuevoDetalle.setPrecioCompra(producto.getPrecioCompra());
-            nuevoDetalle.setIdEmpresa(movimiento.getIdEmpresa());
+            nuevoDetalle.setEmpresa(movimiento.getEmpresa());
 
             nuevosDetalles.add(nuevoDetalle);
         }
@@ -381,7 +381,7 @@ public class MovimientoServiceImpl implements MovimientoService {
         movimiento.setUsuario(usuario);
         movimiento.setFechaMovimiento(OffsetDateTime.now());
         movimiento.setMotivo("Revisión Periódica: " + (diferencia > 0 ? "Sobrante" : "Faltante"));
-        movimiento.setIdEmpresa(usuario.getIdEmpresa());
+        movimiento.setEmpresa(usuario.getEmpresa());
 
         MovimientoInventario movGuardado = movimientoRepository.save(movimiento);
 
@@ -390,7 +390,7 @@ public class MovimientoServiceImpl implements MovimientoService {
             loteAjuste.setProducto(producto);
             loteAjuste.setCantidad(diferencia);
             loteAjuste.setCodigoLote("AJUSTE-" + System.currentTimeMillis());
-            loteAjuste.setIdEmpresa(usuario.getIdEmpresa());
+            loteAjuste.setEmpresa(usuario.getEmpresa());
             if (Boolean.TRUE.equals(producto.getEsPerecible())) {
                 loteAjuste.setFechaVencimiento(OffsetDateTime.now().plusMonths(6));
             }
@@ -427,7 +427,7 @@ public class MovimientoServiceImpl implements MovimientoService {
         detalle.setCantidad(Math.abs(diferencia));
         detalle.setPrecioVenta(producto.getPrecioVenta());
         detalle.setPrecioCompra(producto.getPrecioCompra());
-        detalle.setIdEmpresa(usuario.getIdEmpresa());
+        detalle.setEmpresa(usuario.getEmpresa());
         // stockAnterior y stockNuevo eliminados del esquema — info va en el motivo del movimiento
 
         detalleMovimientoRepository.save(detalle);
@@ -463,7 +463,7 @@ public class MovimientoServiceImpl implements MovimientoService {
             lote.setProducto(producto);
             lote.setCantidad(cantidad);
             lote.setCodigoLote("RECOVERY-" + System.currentTimeMillis());
-            lote.setIdEmpresa(producto.getIdEmpresa());
+            lote.setEmpresa(producto.getEmpresa());
             loteRepository.save(lote);
         } else {
             Lote lotePrioritario = lotes.get(0);

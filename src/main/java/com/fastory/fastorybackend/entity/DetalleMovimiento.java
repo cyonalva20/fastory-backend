@@ -1,10 +1,12 @@
 package com.fastory.fastorybackend.entity;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.Filter;
 import java.math.BigDecimal;
 
 @Entity
 @Table(name = "detalle_movimiento")
+@Filter(name = "tenantFilter", condition = "id_empresa = :empresaId")
 public class DetalleMovimiento extends BaseEntity {
 
     @Id
