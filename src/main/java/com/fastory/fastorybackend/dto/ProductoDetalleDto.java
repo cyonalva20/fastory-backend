@@ -1,24 +1,22 @@
 package com.fastory.fastorybackend.dto;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 // Este DTO es para el modal "Ver Detalles"
 public class ProductoDetalleDto {
 
-    private Integer idProducto; // <-- AÑADIDO
+    private Integer idProducto;
     private String nombre;
     private String categoria;
     private Integer idCategoria;
-    private String marca;
-    private String descripcion;
-    private Double precioCompra;
-    private Double precioVenta;
+    private BigDecimal precioCompra;
+    private BigDecimal precioVenta;
     private Integer stockDisponible;
     private Integer stockMinimo;
     private String ubicacion;
     private boolean perecible;
-    private String fechaVencimientoProxima; // La fecha más cercana
-    private String proveedor; // <-- AÑADIDO
+    private String fechaVencimientoProxima;
     private List<LoteDetalleDto> lotes;
     // --- NUEVOS CAMPOS PARA UBICACIÓN DETALLADA ---
     private Integer idUbicacion;
@@ -54,35 +52,19 @@ public class ProductoDetalleDto {
         this.categoria = categoria;
     }
 
-    public String getMarca() {
-        return marca;
-    }
-
-    public void setMarca(String marca) {
-        this.marca = marca;
-    }
-
-    public String getDescripcion() {
-        return descripcion;
-    }
-
-    public void setDescripcion(String descripcion) {
-        this.descripcion = descripcion;
-    }
-
-    public Double getPrecioCompra() {
+    public BigDecimal getPrecioCompra() {
         return precioCompra;
     }
 
-    public void setPrecioCompra(Double precioCompra) {
+    public void setPrecioCompra(BigDecimal precioCompra) {
         this.precioCompra = precioCompra;
     }
 
-    public Double getPrecioVenta() {
+    public BigDecimal getPrecioVenta() {
         return precioVenta;
     }
 
-    public void setPrecioVenta(Double precioVenta) {
+    public void setPrecioVenta(BigDecimal precioVenta) {
         this.precioVenta = precioVenta;
     }
 
@@ -125,16 +107,6 @@ public class ProductoDetalleDto {
     public void setFechaVencimientoProxima(String fechaVencimientoProxima) {
         this.fechaVencimientoProxima = fechaVencimientoProxima;
     }
-
-    // --- AÑADIDO GETTER Y SETTER ---
-    public String getProveedor() {
-        return proveedor;
-    }
-
-    public void setProveedor(String proveedor) {
-        this.proveedor = proveedor;
-    }
-    // -------------------------------
 
     public List<LoteDetalleDto> getLotes() {
         return lotes;
