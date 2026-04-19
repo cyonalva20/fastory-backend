@@ -29,7 +29,7 @@ import java.util.List;
 public class ReporteExportService {
 
     private final String[] HEADERS = {
-            "ID", "Nombre", "Categoría", "Marca", "Ubicación",
+            "ID", "Nombre", "Categoría", "Ubicación",
             "Stock Disp.", "Stock Mínimo"
     };
 
@@ -74,10 +74,9 @@ public class ReporteExportService {
                 row.createCell(0).setCellValue(dto.getIdProducto());
                 row.createCell(1).setCellValue(dto.getNombreProducto());
                 row.createCell(2).setCellValue(dto.getCategoria());
-                row.createCell(3).setCellValue(dto.getMarca());
-                row.createCell(4).setCellValue(dto.getUbicacion());
-                row.createCell(5).setCellValue(dto.getStockDisponible());
-                row.createCell(6).setCellValue(dto.getStockMinimo());
+                row.createCell(3).setCellValue(dto.getUbicacion());
+                row.createCell(4).setCellValue(dto.getStockDisponible());
+                row.createCell(5).setCellValue(dto.getStockMinimo());
             }
 
             // Ajustar el ancho de las columnas
@@ -142,7 +141,6 @@ public class ReporteExportService {
 
                 table.addCell(new Phrase(dto.getNombreProducto(), dataFont));
                 table.addCell(new Phrase(dto.getCategoria(), dataFont));
-                table.addCell(new Phrase(dto.getMarca(), dataFont));
                 table.addCell(new Phrase(dto.getUbicacion(), dataFont));
 
                 // Stock (Centrado)

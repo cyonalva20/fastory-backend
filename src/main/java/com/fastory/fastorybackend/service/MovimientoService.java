@@ -25,7 +25,6 @@ public interface MovimientoService {
 
     List<ReporteDto> generarReporteStockActual(
             Integer categoriaId,
-            String marca,
             Boolean stockBajoMinimo,
             String sortBy,
             String sortDir);

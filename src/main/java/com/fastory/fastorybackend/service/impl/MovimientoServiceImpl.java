@@ -54,7 +54,6 @@ public class MovimientoServiceImpl implements MovimientoService {
                             p.getEsPerecible(),
                             p.getIdProducto(),
                             p.getNombreProducto(),
-                            null, // descripcionProducto eliminada del esquema
                             p.getPrecioVenta() != null ? p.getPrecioVenta().doubleValue() : 0.0,
                             stockReal
                     );
@@ -148,7 +147,7 @@ public class MovimientoServiceImpl implements MovimientoService {
         movimiento.setMotivo("Entrada de proveedor: " + proveedor.getNombreProveedor());
         movimiento.setFechaMovimiento(
                 entradaDto.getFechaEntrada() != null
-                        ? entradaDto.getFechaEntrada().atOffset(ZoneOffset.UTC)
+                        ? entradaDto.getFechaEntrada()
                         : OffsetDateTime.now());
 
         MovimientoInventario movimientoGuardado = movimientoRepository.save(movimiento);
@@ -173,10 +172,7 @@ public class MovimientoServiceImpl implements MovimientoService {
             Lote nuevoLote = new Lote();
             nuevoLote.setProducto(producto);
             nuevoLote.setCantidad(detalleDto.getCantidad());
-            nuevoLote.setFechaVencimiento(
-                    detalleDto.getFechaVencimiento() != null
-                            ? detalleDto.getFechaVencimiento().atOffset(ZoneOffset.UTC)
-                            : null);
+            nuevoLote.setFechaVencimiento(detalleDto.getFechaVencimiento());
             nuevoLote.setCodigoLote("LOTE-" + producto.getIdProducto() + "-" + System.currentTimeMillis());
             nuevoLote.setEmpresa(usuario.getEmpresa());
 
@@ -191,9 +187,9 @@ public class MovimientoServiceImpl implements MovimientoService {
             detalleMovimiento.setEmpresa(usuario.getEmpresa());
 
             detalleMovimiento.setPrecioCompra(
-                    detalleDto.getPrecioCompra() != null ? BigDecimal.valueOf(detalleDto.getPrecioCompra()) : BigDecimal.ZERO);
+                    detalleDto.getPrecioCompra() != null ? detalleDto.getPrecioCompra() : BigDecimal.ZERO);
             detalleMovimiento.setPrecioVenta(
-                    detalleDto.getPrecioVenta() != null ? BigDecimal.valueOf(detalleDto.getPrecioVenta()) : BigDecimal.ZERO);
+                    detalleDto.getPrecioVenta() != null ? detalleDto.getPrecioVenta() : BigDecimal.ZERO);
 
             detallesAGuardar.add(detalleMovimiento);
         }
@@ -209,8 +205,8 @@ public class MovimientoServiceImpl implements MovimientoService {
             int stockActual = productoAfectado.getStock() != null ? productoAfectado.getStock() : 0;
             productoAfectado.setStock(stockActual + detalleDto.getCantidad());
 
-            if (detalleDto.getPrecioCompra() != null && detalleDto.getPrecioCompra() > 0) {
-                productoAfectado.setPrecioCompra(BigDecimal.valueOf(detalleDto.getPrecioCompra()));
+            if (detalleDto.getPrecioCompra() != null && detalleDto.getPrecioCompra().compareTo(BigDecimal.ZERO) > 0) {
+                productoAfectado.setPrecioCompra(detalleDto.getPrecioCompra());
             }
 
             productoRepository.save(productoAfectado);
@@ -231,7 +227,6 @@ public class MovimientoServiceImpl implements MovimientoService {
     @Override
     public List<ReporteDto> generarReporteStockActual(
             Integer categoriaId,
-            String marca,
             Boolean stockBajoMinimo,
             String sortBy,
             String sortDir) {
@@ -278,7 +273,6 @@ public class MovimientoServiceImpl implements MovimientoService {
                             p.getIdProducto(),
                             p.getNombreProducto(),
                             nombreCategoria,
-                            null, // marca eliminada del esquema
                             ubicacionStr,
                             stockReal,
                             p.getStockMinimo());

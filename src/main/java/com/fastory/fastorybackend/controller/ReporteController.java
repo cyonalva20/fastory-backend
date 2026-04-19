@@ -44,14 +44,12 @@ public class ReporteController {
     @GetMapping("/stock-actual")
     public ResponseEntity<Object> generarReporteStockActual(
             @RequestParam(required = false) Integer categoriaId,
-            @RequestParam(required = false) String marca,
             @RequestParam(required = false) Boolean stockBajoMinimo,
             @RequestParam(defaultValue = "nombreProducto") String sortBy,
             @RequestParam(defaultValue = "asc") String sortDir) {
         try {
             List<ReporteDto> reporte = movimientoService.generarReporteStockActual(
                     categoriaId,
-                    marca,
                     stockBajoMinimo,
                     sortBy,
                     sortDir);
@@ -77,13 +75,12 @@ public class ReporteController {
     public ResponseEntity<Object> exportarReporteStockActual(
             @RequestParam(required = true) String formato,
             @RequestParam(required = false) Integer categoriaId,
-            @RequestParam(required = false) String marca,
             @RequestParam(required = false) Boolean stockBajoMinimo,
             @RequestParam(defaultValue = "nombreProducto") String sortBy,
             @RequestParam(defaultValue = "asc") String sortDir) {
         try {
             List<ReporteDto> data = movimientoService.generarReporteStockActual(
-                    categoriaId, marca, stockBajoMinimo, sortBy, sortDir);
+                    categoriaId, stockBajoMinimo, sortBy, sortDir);
 
             if (data.isEmpty()) {
                 return ResponseEntity.ok(Map.of("message", NO_PRODUCTS_MESSAGE));

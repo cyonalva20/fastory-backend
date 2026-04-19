@@ -3,16 +3,14 @@ package com.fastory.fastorybackend.dto;
 public class ProductoBusquedaDto {
     private Integer idProducto;
     private String nombreProducto;
-    private String descripcionProducto;
     private Double precioVenta;
     private Integer stock;
     private Boolean esPerecible;
 
     public ProductoBusquedaDto(Boolean esPerecible, Integer idProducto, String nombreProducto,
-            String descripcionProducto, Double precioVenta, Integer stock) {
+            Double precioVenta, Integer stock) {
         this.idProducto = idProducto;
         this.nombreProducto = nombreProducto;
-        this.descripcionProducto = descripcionProducto;
         this.precioVenta = precioVenta;
         this.stock = stock;
         this.esPerecible = esPerecible;
@@ -33,14 +31,6 @@ public class ProductoBusquedaDto {
 
     public void setNombreProducto(String nombreProducto) {
         this.nombreProducto = nombreProducto;
-    }
-
-    public String getDescripcionProducto() {
-        return descripcionProducto;
-    }
-
-    public void setDescripcionProducto(String descripcionProducto) {
-        this.descripcionProducto = descripcionProducto;
     }
 
     public Double getPrecioVenta() {
