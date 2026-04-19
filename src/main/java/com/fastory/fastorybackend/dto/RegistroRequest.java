@@ -3,6 +3,7 @@ package com.fastory.fastorybackend.dto;
 public class RegistroRequest {
 
     private String nombreEmpresa;
+    private String ruc;
     private String username;
     private String password;
     private String nombre;
@@ -15,6 +16,14 @@ public class RegistroRequest {
 
     public void setNombreEmpresa(String nombreEmpresa) {
         this.nombreEmpresa = nombreEmpresa;
+    }
+
+    public String getRuc() {
+        return ruc;
+    }
+
+    public void setRuc(String ruc) {
+        this.ruc = ruc;
     }
 
     public String getUsername() {

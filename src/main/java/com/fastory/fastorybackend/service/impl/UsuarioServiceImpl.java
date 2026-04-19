@@ -61,8 +61,9 @@ public class UsuarioServiceImpl implements UsuarioService {
         // Crear la empresa
         Empresa empresa = new Empresa();
         empresa.setNombreComercial(request.getNombreEmpresa());
+        empresa.setRuc(request.getRuc());
         empresa.setEstadoSuscripcion("PRUEBA");
-        // No se mapea RUC/direccion porque el request basico podria no tenerlos
+        // No se mapea direccion porque el request basico podria no tenerlos
         Empresa empresaGuardada = empresaRepository.save(empresa);
 
         // Buscar rol administrador (asumiendo que existe en la BD o se crea un ID por

@@ -30,6 +30,14 @@ public abstract class BaseEntity {
         if (updatedAt == null) {
             updatedAt = OffsetDateTime.now();
         }
+        if (empresa == null) {
+            org.springframework.security.core.Authentication auth = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
+            if (auth != null && auth.getPrincipal() instanceof com.fastory.fastorybackend.config.TenantUserDetails userDetails) {
+                Empresa e = new Empresa();
+                e.setIdEmpresa(userDetails.getIdEmpresa());
+                this.empresa = e;
+            }
+        }
     }
 
     @PreUpdate
