@@ -172,19 +172,15 @@ public class ProductoServiceImpl implements ProductoService {
 
             String categoriaNombre = (p.getCategoria() != null) ? p.getCategoria().getNombreCategoria() : "N/A";
 
-            // Proveedor eliminado del esquema de Producto
-            String proveedorNombre = "N/A";
-
             return new ProductoInventarioDto(
                     p.getIdProducto(),
                     p.getNombreProducto(),
                     categoriaNombre,
-                    p.getPrecioCompra() != null ? p.getPrecioCompra().doubleValue() : 0.0,
-                    p.getPrecioVenta() != null ? p.getPrecioVenta().doubleValue() : 0.0,
+                    p.getPrecioCompra() != null ? p.getPrecioCompra() : BigDecimal.ZERO,
+                    p.getPrecioVenta() != null ? p.getPrecioVenta() : BigDecimal.ZERO,
                     stockDisp,
                     p.getStockMinimo(),
-                    ubicacionStr,
-                    proveedorNombre
+                    ubicacionStr
             );
         }).collect(Collectors.toList());
     }
@@ -219,12 +215,11 @@ public class ProductoServiceImpl implements ProductoService {
                 p.getIdProducto(),
                 p.getNombreProducto(),
                 categoriaNombre,
-                p.getPrecioCompra() != null ? p.getPrecioCompra().doubleValue() : 0.0,
-                p.getPrecioVenta() != null ? p.getPrecioVenta().doubleValue() : 0.0,
+                p.getPrecioCompra() != null ? p.getPrecioCompra() : BigDecimal.ZERO,
+                p.getPrecioVenta() != null ? p.getPrecioVenta() : BigDecimal.ZERO,
                 stockDisp,
                 p.getStockMinimo(),
-                ubicacionStr,
-                "N/A"); // Proveedor eliminado del esquema
+                ubicacionStr);
     }
 
     @Override
@@ -270,10 +265,8 @@ public class ProductoServiceImpl implements ProductoService {
         detalleDto.setNombre(p.getNombreProducto());
         detalleDto.setCategoria(p.getCategoria() != null ? p.getCategoria().getNombreCategoria() : "N/A");
         detalleDto.setIdCategoria(p.getCategoria() != null ? p.getCategoria().getIdCategoria() : null);
-        detalleDto.setMarca(null); // marca eliminada del esquema
-        detalleDto.setDescripcion(null); // descripcion eliminada del esquema
-        detalleDto.setPrecioCompra(p.getPrecioCompra() != null ? p.getPrecioCompra().doubleValue() : null);
-        detalleDto.setPrecioVenta(p.getPrecioVenta() != null ? p.getPrecioVenta().doubleValue() : null);
+        detalleDto.setPrecioCompra(p.getPrecioCompra());
+        detalleDto.setPrecioVenta(p.getPrecioVenta());
         detalleDto.setStockDisponible(stockDisp);
         detalleDto.setStockMinimo(p.getStockMinimo());
         detalleDto.setUbicacion(ubicacionStr);
@@ -288,7 +281,6 @@ public class ProductoServiceImpl implements ProductoService {
 
         detalleDto.setPerecible(Boolean.TRUE.equals(p.getEsPerecible()));
         detalleDto.setFechaVencimientoProxima(fechaProxima);
-        detalleDto.setProveedor("N/A"); // proveedor eliminado del esquema
         detalleDto.setLotes(lotesDto);
 
         return detalleDto;
@@ -332,9 +324,8 @@ public class ProductoServiceImpl implements ProductoService {
         }
 
         producto.setNombreProducto(dto.getNombreProducto());
-        // descripcion y marca eliminadas del esquema
-        producto.setPrecioCompra(dto.getPrecioCompra() != null ? BigDecimal.valueOf(dto.getPrecioCompra()) : producto.getPrecioCompra());
-        producto.setPrecioVenta(dto.getPrecioVenta() != null ? BigDecimal.valueOf(dto.getPrecioVenta()) : producto.getPrecioVenta());
+        producto.setPrecioCompra(dto.getPrecioCompra() != null ? dto.getPrecioCompra() : producto.getPrecioCompra());
+        producto.setPrecioVenta(dto.getPrecioVenta() != null ? dto.getPrecioVenta() : producto.getPrecioVenta());
         producto.setStockMinimo(dto.getStockMinimo());
         producto.setCategoria(categoria);
 

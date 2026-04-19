@@ -1,11 +1,11 @@
 package com.fastory.fastorybackend.dto;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 
 public class RegistroEntradaDto {
     private Integer idProveedor;
-    private LocalDateTime fechaEntrada;
+    private OffsetDateTime fechaEntrada;
     private List<DetalleEntradaDto> detalles;
 
     // Getters y Setters
@@ -17,11 +17,11 @@ public class RegistroEntradaDto {
         this.idProveedor = idProveedor;
     }
 
-    public LocalDateTime getFechaEntrada() {
+    public OffsetDateTime getFechaEntrada() {
         return fechaEntrada;
     }
 
-    public void setFechaEntrada(LocalDateTime fechaEntrada) {
+    public void setFechaEntrada(OffsetDateTime fechaEntrada) {
         this.fechaEntrada = fechaEntrada;
     }
 

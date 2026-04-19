@@ -46,7 +46,7 @@ public class ProductoController {
                 return ResponseEntity.badRequest()
                         .body("Ya existe un producto con ese nombre");
             }
-            if (productoDTO.getPrecioCompra() >= productoDTO.getPrecioVenta()) {
+            if (productoDTO.getPrecioCompra().compareTo(productoDTO.getPrecioVenta()) >= 0) {
                 return ResponseEntity.badRequest()
                         .body("El precio de venta debe ser mayor al precio de compra");
             }
@@ -56,8 +56,8 @@ public class ProductoController {
             producto.setNombreProducto(productoDTO.getNombreProducto());
             // descripcionProducto eliminada del esquema
             producto.setUnidadMedida(productoDTO.getUnidadMedida());
-            producto.setPrecioCompra(BigDecimal.valueOf(productoDTO.getPrecioCompra()));
-            producto.setPrecioVenta(BigDecimal.valueOf(productoDTO.getPrecioVenta()));
+            producto.setPrecioCompra(productoDTO.getPrecioCompra());
+            producto.setPrecioVenta(productoDTO.getPrecioVenta());
             producto.setStock(productoDTO.getStock() != null ? productoDTO.getStock() : 0);
             producto.setStockMinimo(productoDTO.getStockMinimo());
             producto.setEsPerecible(productoDTO.isPerecible());
@@ -70,13 +70,11 @@ public class ProductoController {
             producto.setCategoria(categoria);
             // Proveedor eliminado de Producto en el nuevo esquema
 
-            // Asignar ubicación
+            // Asignar ubicación (opcional según esquema)
             if (productoDTO.getIdUbicacion() != null) {
                 Ubicacion ubicacion = new Ubicacion();
                 ubicacion.setIdUbicacion(productoDTO.getIdUbicacion());
                 producto.setUbicacion(ubicacion);
-            } else {
-                return ResponseEntity.badRequest().body("Debe seleccionar una ubicación para el producto");
             }
 
             TenantUserDetails userDetails = (TenantUserDetails) authentication.getPrincipal();
