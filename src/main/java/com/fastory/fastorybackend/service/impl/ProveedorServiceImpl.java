@@ -52,6 +52,7 @@ public class ProveedorServiceImpl implements ProveedorService {
 
         Proveedor nuevoProveedor = new Proveedor();
         nuevoProveedor.setNombreProveedor(createDto.getNombreProveedor());
+        nuevoProveedor.setRucProveedor(createDto.getRucProveedor());
         nuevoProveedor.setTelefono(createDto.getTelefono());
 
         TenantUserDetails userDetails = (TenantUserDetails) SecurityContextHolder
@@ -92,6 +93,7 @@ public class ProveedorServiceImpl implements ProveedorService {
                 });
 
         proveedor.setNombreProveedor(updateDto.getNombreProveedor());
+        proveedor.setRucProveedor(updateDto.getRucProveedor());
         proveedor.setTelefono(updateDto.getTelefono());
 
         Proveedor proveedorActualizado = proveedorRepository.save(proveedor);
@@ -114,6 +116,7 @@ public class ProveedorServiceImpl implements ProveedorService {
         ProveedorDto dto = new ProveedorDto();
         dto.setIdProveedor(proveedor.getIdProveedor());
         dto.setNombreProveedor(proveedor.getNombreProveedor());
+        dto.setRucProveedor(proveedor.getRucProveedor());
         dto.setTelefono(proveedor.getTelefono());
         dto.setCantidadProductos(0); // Relación Proveedor→Productos ya no existe
         return dto;

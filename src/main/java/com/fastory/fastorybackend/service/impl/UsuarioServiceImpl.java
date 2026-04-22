@@ -54,9 +54,6 @@ public class UsuarioServiceImpl implements UsuarioService {
     @Override
     @Transactional
     public void registrarOnboarding(com.fastory.fastorybackend.dto.RegistroRequest request) {
-        if (usuarioRepository.findByUsername(request.getUsername()).isPresent()) {
-            throw new IllegalArgumentException("El usuario ya existe");
-        }
 
         // Crear la empresa
         Empresa empresa = new Empresa();

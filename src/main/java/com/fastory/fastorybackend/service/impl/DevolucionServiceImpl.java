@@ -42,18 +42,17 @@ public class DevolucionServiceImpl {
         producto.setStock(producto.getStock() - dto.getCantidad());
         productoRepository.save(producto);
 
-        // 3. Crear registro de Devolución (nuevo esquema)
-        // TODO: Obtener el proveedor correcto — ahora Producto no tiene relación con Proveedor.
-        // Por ahora se requiere que el DTO incluya idProveedor, o se busca el primero disponible.
-        Proveedor proveedor = proveedorRepository.findAll().stream().findFirst()
-                .orElseThrow(() -> new ResourceNotFoundException("No hay proveedores registrados"));
+        // 3. Crear registro de Devolución
+        Proveedor proveedor = proveedorRepository.findById(dto.getIdProveedor())
+                .orElseThrow(() -> new ResourceNotFoundException("Proveedor no encontrado con id: " + dto.getIdProveedor()));
 
         Devolucion devolucion = new Devolucion();
         devolucion.setProducto(producto);
         devolucion.setProveedor(proveedor);
         devolucion.setCantidad(dto.getCantidad());
-        devolucion.setMotivo("Devolución de lote: " + lote.getCodigoLote());
+        devolucion.setMotivo(dto.getMotivo() != null ? dto.getMotivo() : "Devolución de lote: " + lote.getCodigoLote());
         devolucion.setEstado("PENDIENTE");
+        devolucion.setFechaEntrega(dto.getFechaEntrega());
         devolucion.setEmpresa(producto.getEmpresa());
 
         devolucionRepository.save(devolucion);

@@ -15,8 +15,6 @@ public interface MovimientoService {
 
     List<MovimientoHistorialDto> obtenerHistorialDeSalidas();
 
-    List<ProductoPorProveedorDto> obtenerProductosPorProveedor(Integer idProveedor);
-
     void registrarEntrada(RegistroEntradaDto entradaDto, String username);
 
     List<MovimientoHistorialDto> obtenerHistorialDeEntradas();
