@@ -1,6 +1,7 @@
 package com.fastory.fastorybackend.dto;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 public class ProveedorCreateDto {
@@ -8,7 +9,11 @@ public class ProveedorCreateDto {
     @Size(max = 150, message = "El nombre del proveedor no puede exceder los 150 caracteres.")
     private String nombreProveedor;
 
-    @Size(max = 9, message = "El teléfono de la categoría no puede exceder los 9 caracteres.")
+    @Size(max = 11, message = "El RUC no puede exceder los 11 caracteres.")
+    @Pattern(regexp = "^[0-9]*$", message = "El RUC solo puede contener números.")
+    private String rucProveedor;
+
+    @Size(max = 15, message = "El teléfono no puede exceder los 15 caracteres.")
     private String telefono;
 
     public String getNombreProveedor() {
@@ -17,6 +22,14 @@ public class ProveedorCreateDto {
 
     public void setNombreProveedor(String nombreProveedor) {
         this.nombreProveedor = nombreProveedor;
+    }
+
+    public String getRucProveedor() {
+        return rucProveedor;
+    }
+
+    public void setRucProveedor(String rucProveedor) {
+        this.rucProveedor = rucProveedor;
     }
 
     public String getTelefono() {

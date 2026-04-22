@@ -122,13 +122,6 @@ public class MovimientoServiceImpl implements MovimientoService {
     }
 
     @Override
-    public List<ProductoPorProveedorDto> obtenerProductosPorProveedor(Integer idProveedor) {
-        // Relación Producto→Proveedor eliminada en el nuevo esquema.
-        // TODO: Redefinir esta lógica de negocio cuando se diseñe la relación productos-proveedores.
-        return List.of();
-    }
-
-    @Override
     @Transactional
     public void registrarEntrada(RegistroEntradaDto entradaDto, String username) {
         Usuario usuario = usuarioRepository.findByUsername(username)
