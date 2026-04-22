@@ -24,6 +24,7 @@ import java.util.Arrays;
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final SuscripcionFilter suscripcionFilter;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -55,6 +56,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/devoluciones/pendientes").authenticated()
                         .requestMatchers("/api/v1/devoluciones").authenticated()
                         .requestMatchers("/api/v1/reportes/**").authenticated()
+                        .requestMatchers("/api/v1/suscripcion/**").authenticated()
 
                         // 🔸 Usuarios y Roles
                         .requestMatchers("/api/v1/usuarios/**").authenticated()
@@ -67,6 +69,7 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
         http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+        http.addFilterAfter(suscripcionFilter, JwtAuthenticationFilter.class);
 
         return http.build();
     }
