@@ -60,6 +60,7 @@ public class UsuarioServiceImpl implements UsuarioService {
         empresa.setNombreComercial(request.getNombreEmpresa());
         empresa.setRuc(request.getRuc());
         empresa.setEstadoSuscripcion("PRUEBA");
+        empresa.setFechaVencimiento(OffsetDateTime.now().plusDays(90));
         // No se mapea direccion porque el request basico podria no tenerlos
         Empresa empresaGuardada = empresaRepository.save(empresa);
 
