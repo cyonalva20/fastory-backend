@@ -13,6 +13,7 @@ public class ProductoInventarioDto {
     private Integer stockDisponible;
     private Integer stockMinimo;
     private String ubicacion; // Formato "A-1-2"
+    private Boolean perecible;
 
     // Constructor, Getters y Setters
 
@@ -20,7 +21,7 @@ public class ProductoInventarioDto {
     }
 
     public ProductoInventarioDto(Integer idProducto, String nombre, String categoria, BigDecimal precioCompra,
-            BigDecimal precioVenta, Integer stockDisponible, Integer stockMinimo, String ubicacion) {
+            BigDecimal precioVenta, Integer stockDisponible, Integer stockMinimo, String ubicacion, Boolean perecible) {
         this.idProducto = idProducto;
         this.nombre = nombre;
         this.categoria = categoria;
@@ -29,6 +30,7 @@ public class ProductoInventarioDto {
         this.stockDisponible = stockDisponible;
         this.stockMinimo = stockMinimo;
         this.ubicacion = ubicacion;
+        this.perecible = perecible;
     }
 
     public Integer getIdProducto() {
@@ -93,5 +95,13 @@ public class ProductoInventarioDto {
 
     public void setUbicacion(String ubicacion) {
         this.ubicacion = ubicacion;
+    }
+
+    public Boolean getPerecible() {
+        return perecible;
+    }
+
+    public void setPerecible(Boolean perecible) {
+        this.perecible = perecible;
     }
 }

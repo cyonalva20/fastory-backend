@@ -25,6 +25,8 @@ public class ProveedorServiceImpl implements ProveedorService {
 
     private final EmpresaRepository empresaRepository;
 
+    private final com.fastory.fastorybackend.repository.DetalleMovimientoRepository detalleMovimientoRepository;
+
     @Override
     @Transactional(readOnly = true)
     public List<Proveedor> obtenerTodas() {
@@ -118,7 +120,10 @@ public class ProveedorServiceImpl implements ProveedorService {
         dto.setNombreProveedor(proveedor.getNombreProveedor());
         dto.setRucProveedor(proveedor.getRucProveedor());
         dto.setTelefono(proveedor.getTelefono());
-        dto.setCantidadProductos(0); // Relación Proveedor→Productos ya no existe
+        
+        String proveedorMotivo = "Entrada de proveedor: " + proveedor.getNombreProveedor();
+        Integer count = detalleMovimientoRepository.countDistinctProductosByProveedorMotivo(proveedorMotivo);
+        dto.setCantidadProductos(count != null ? count : 0);
         return dto;
     }
 }

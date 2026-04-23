@@ -36,6 +36,7 @@ public class ReporteController {
     private ReporteExportService reporteExportService;
 
     private final DetalleMovimientoRepository detalleRepository;
+    private final com.fastory.fastorybackend.repository.ProveedorRepository proveedorRepository;
 
     /**
      * Endpoint 1: Genera el reporte de stock actual en formato JSON (para la
@@ -148,4 +149,24 @@ public class ReporteController {
         return ResponseEntity.ok(data);
     }
 
+    @GetMapping("/entradas-proveedor")
+    public ResponseEntity<Object> reporteEntradasProveedor(
+            @RequestParam Long idProveedor,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate desde,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate hasta) {
+
+        OffsetDateTime inicio = desde.atStartOfDay().atOffset(ZoneOffset.UTC);
+        OffsetDateTime fin = hasta.atTime(LocalTime.MAX).atOffset(ZoneOffset.UTC);
+
+        String proveedorNombre = proveedorRepository.findById(idProveedor.intValue())
+                .map(com.fastory.fastorybackend.entity.Proveedor::getNombreProveedor)
+                .orElse("");
+                
+        String proveedorMotivo = "Entrada de proveedor: " + proveedorNombre;
+
+        List<ReportesAnaliticosDto.EntradaProveedorProjection> data = detalleRepository
+                .findEntradasPorProveedor(proveedorMotivo, inicio, fin);
+
+        return ResponseEntity.ok(data);
+    }
 }
