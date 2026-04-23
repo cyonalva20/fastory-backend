@@ -148,23 +148,4 @@ public class ReporteController {
         return ResponseEntity.ok(data);
     }
 
-    // Endpoint entradas-proveedor comentado temporalmente.
-    // La consulta del repositorio fue comentada porque referenciaba m.proveedor que ya no existe.
-    // TODO: Redefinir este endpoint cuando se diseñe la nueva relación movimiento-proveedor.
-    /*
-    @GetMapping("/entradas-proveedor")
-    public ResponseEntity<Object> reporteEntradasProveedor(
-            @RequestParam Integer idProveedor,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate desde,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate hasta) {
-
-        OffsetDateTime inicio = desde.atStartOfDay().atOffset(ZoneOffset.UTC);
-        OffsetDateTime fin = hasta.atTime(LocalTime.MAX).atOffset(ZoneOffset.UTC);
-
-        List<ReportesAnaliticosDto.EntradaProveedorProjection> data = detalleRepository
-                .findEntradasPorProveedor(idProveedor, inicio, fin);
-
-        return ResponseEntity.ok(data);
-    }
-    */
 }

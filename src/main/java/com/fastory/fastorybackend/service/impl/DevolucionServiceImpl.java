@@ -9,7 +9,7 @@ import com.fastory.fastorybackend.entity.*;
 import com.fastory.fastorybackend.exception.ResourceNotFoundException;
 import com.fastory.fastorybackend.repository.*;
 
-import java.time.OffsetDateTime;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -73,7 +73,4 @@ public class DevolucionServiceImpl {
                 .collect(Collectors.toList());
     }
 
-    // Tarea automática de procesamiento eliminada temporalmente.
-    // El nuevo esquema no tiene fechaRecepcionProgramada/horaRecepcionProgramada.
-    // TODO: Redefinir lógica de procesamiento automático de devoluciones con el nuevo esquema.
 }

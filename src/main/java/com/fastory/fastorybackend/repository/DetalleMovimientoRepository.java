@@ -47,22 +47,4 @@ public interface DetalleMovimientoRepository extends JpaRepository<DetalleMovimi
                         @Param("fin") OffsetDateTime fin,
                         @Param("umbral") Long umbral);
 
-        // 3. Entradas por proveedor
-        // TODO: Esta consulta referenciaba m.proveedor que ya no existe en el nuevo esquema.
-        // Comentada hasta que se redefina la lógica de negocio para entradas por proveedor.
-        /*
-        @Query("SELECT p.nombreProducto as nombreProducto, l.codigoLote as codigoLote, d.cantidad as cantidadRecibida, m.fechaMovimiento as fechaEntrada "
-                        +
-                        "FROM DetalleMovimiento d " +
-                        "JOIN d.movimientoInventario m " +
-                        "JOIN d.producto p " +
-                        "LEFT JOIN d.lote l " +
-                        "WHERE m.tipoMovimiento = 'ENTRADA' " +
-                        "AND m.fechaMovimiento BETWEEN :inicio AND :fin " +
-                        "ORDER BY m.fechaMovimiento DESC")
-        List<ReportesAnaliticosDto.EntradaProveedorProjection> findEntradasPorProveedor(
-                        @Param("idProveedor") Integer idProveedor,
-                        @Param("inicio") OffsetDateTime inicio,
-                        @Param("fin") OffsetDateTime fin);
-        */
 }

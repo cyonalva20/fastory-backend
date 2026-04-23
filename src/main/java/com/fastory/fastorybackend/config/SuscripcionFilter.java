@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fastory.fastorybackend.entity.Empresa;
+
 import com.fastory.fastorybackend.repository.EmpresaRepository;
 
 import lombok.RequiredArgsConstructor;

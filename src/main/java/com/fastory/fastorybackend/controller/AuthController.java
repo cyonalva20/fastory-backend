@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import com.fastory.fastorybackend.config.JwtUtil;
 import com.fastory.fastorybackend.dto.LoginRequest;
 import com.fastory.fastorybackend.dto.LoginResponse;
-import com.fastory.fastorybackend.entity.Rol;
+
 import com.fastory.fastorybackend.entity.Usuario;
 import com.fastory.fastorybackend.repository.RolRepository;
 import com.fastory.fastorybackend.repository.UsuarioRepository;
