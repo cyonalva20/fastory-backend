@@ -47,4 +47,27 @@ public interface DetalleMovimientoRepository extends JpaRepository<DetalleMovimi
                         @Param("fin") OffsetDateTime fin,
                         @Param("umbral") Long umbral);
 
+        // 3. Entradas por proveedor (usando el motivo que guarda el nombre)
+        @Query("SELECT p.nombreProducto as nombreProducto, l.codigoLote as codigoLote, d.cantidad as cantidadRecibida, m.fechaMovimiento as fechaEntrada "
+                        +
+                        "FROM DetalleMovimiento d " +
+                        "JOIN d.movimientoInventario m " +
+                        "JOIN d.producto p " +
+                        "LEFT JOIN d.lote l " +
+                        "WHERE m.tipoMovimiento = 'ENTRADA' " +
+                        "AND m.motivo LIKE CONCAT('%', :proveedorMotivo, '%') " +
+                        "AND m.fechaMovimiento BETWEEN :inicio AND :fin " +
+                        "ORDER BY m.fechaMovimiento DESC")
+        List<ReportesAnaliticosDto.EntradaProveedorProjection> findEntradasPorProveedor(
+                        @Param("proveedorMotivo") String proveedorMotivo,
+                        @Param("inicio") OffsetDateTime inicio,
+                        @Param("fin") OffsetDateTime fin);
+
+        @Query("SELECT COUNT(DISTINCT d.producto.idProducto) " +
+                        "FROM DetalleMovimiento d " +
+                        "JOIN d.movimientoInventario m " +
+                        "WHERE m.tipoMovimiento = 'ENTRADA' " +
+                        "AND m.motivo LIKE CONCAT('%', :proveedorMotivo, '%')")
+        Integer countDistinctProductosByProveedorMotivo(@Param("proveedorMotivo") String proveedorMotivo);
+
 }

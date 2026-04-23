@@ -180,7 +180,8 @@ public class ProductoServiceImpl implements ProductoService {
                     p.getPrecioVenta() != null ? p.getPrecioVenta() : BigDecimal.ZERO,
                     stockDisp,
                     p.getStockMinimo(),
-                    ubicacionStr
+                    ubicacionStr,
+                    p.getEsPerecible()
             );
         }).collect(Collectors.toList());
     }
@@ -219,7 +220,8 @@ public class ProductoServiceImpl implements ProductoService {
                 p.getPrecioVenta() != null ? p.getPrecioVenta() : BigDecimal.ZERO,
                 stockDisp,
                 p.getStockMinimo(),
-                ubicacionStr);
+                ubicacionStr,
+                p.getEsPerecible());
     }
 
     @Override
