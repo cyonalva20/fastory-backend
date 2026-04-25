@@ -27,11 +27,12 @@ public class JwtUtil {
      * Genera un JWT que incluye username, rol e idEmpresa como claims.
      * El idEmpresa es esencial para el filtro de tenant en cada request.
      */
-    public String generarToken(String username, String rol, Integer idEmpresa) {
+    public String generarToken(String username, String rol, Integer idEmpresa, String nombreEmpresa) {
         return Jwts.builder()
                 .setSubject(username)
                 .claim("rol", rol)
                 .claim("idEmpresa", idEmpresa)
+                .claim("nombreEmpresa", nombreEmpresa)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)

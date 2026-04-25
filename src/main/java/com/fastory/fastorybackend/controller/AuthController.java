@@ -54,7 +54,7 @@ public class AuthController {
                     .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado"));
 
             String token = jwtUtil.generarToken(usuario.getUsername(), usuario.getRol().getNombreRol(),
-                    usuario.getEmpresa().getIdEmpresa());
+                    usuario.getEmpresa().getIdEmpresa(), usuario.getEmpresa().getNombreComercial());
 
             LoginResponse response = new LoginResponse(
                     "Inicio de sesión correcto",
