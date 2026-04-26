@@ -117,7 +117,7 @@ public class MovimientoController {
      * Requiere rol ADMIN.
      */
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'ALMACENERO')")
     public ResponseEntity<Object> actualizarMovimiento(@PathVariable Integer id,
             @Valid @RequestBody MovimientoUpdateDto dto) {
         try {
@@ -135,7 +135,7 @@ public class MovimientoController {
      * Requiere rol ADMIN.
      */
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'ALMACENERO')")
     public ResponseEntity<Object> eliminarMovimiento(@PathVariable Integer id) {
         try {
             movimientoService.eliminarMovimiento(id);

@@ -56,6 +56,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/devoluciones/pendientes").authenticated()
                         .requestMatchers("/api/v1/devoluciones").authenticated()
                         .requestMatchers("/api/v1/reportes/**").authenticated()
+                        .requestMatchers("/api/v1/auditoria/**").authenticated()
                         .requestMatchers("/api/v1/suscripcion/**").authenticated()
 
                         // 🔸 Usuarios y Roles

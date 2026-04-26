@@ -2,13 +2,16 @@ package com.fastory.fastorybackend.service.impl;
 
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.fastory.fastorybackend.config.TenantUserDetails;
 import com.fastory.fastorybackend.dto.*;
 import com.fastory.fastorybackend.entity.*;
 import com.fastory.fastorybackend.exception.ResourceNotFoundException;
 import com.fastory.fastorybackend.repository.*;
+import com.fastory.fastorybackend.service.AuditoriaService;
 import com.fastory.fastorybackend.service.MovimientoService;
 import com.fastory.fastorybackend.specification.ProductoSpecification;
 
@@ -18,7 +21,9 @@ import java.time.LocalTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -31,6 +36,7 @@ public class MovimientoServiceImpl implements MovimientoService {
     private final UsuarioRepository usuarioRepository;
     private final ProveedorRepository proveedorRepository;
     private final DetalleMovimientoRepository detalleMovimientoRepository;
+    private final AuditoriaService auditoriaService;
     // -------------------------------------------------------------------------
     // --- MÉTODOS DE BÚSQUEDA Y MOVIMIENTOS (Entradas y Salidas) ---
     // -------------------------------------------------------------------------
@@ -297,8 +303,17 @@ public class MovimientoServiceImpl implements MovimientoService {
         MovimientoInventario movimiento = movimientoRepository.findById(idMovimiento)
                 .orElseThrow(() -> new ResourceNotFoundException("Movimiento no encontrado"));
 
+        // --- Permisos por rol ---
+        validarPermisosMovimiento(movimiento);
+
+        // --- Capturar datos anteriores para auditoría ---
+        Map<String, Object> datosAnteriores = construirMapaMovimiento(movimiento);
+
         revertirImpactoLotes(movimiento);
         movimientoRepository.delete(movimiento);
+
+        // --- Registrar auditoría ---
+        auditoriaService.registrar("movimiento_inventario", idMovimiento, "ELIMINAR", datosAnteriores, null);
     }
 
     @Override
@@ -306,6 +321,12 @@ public class MovimientoServiceImpl implements MovimientoService {
     public void actualizarMovimiento(Integer idMovimiento, MovimientoUpdateDto dto) {
         MovimientoInventario movimiento = movimientoRepository.findById(idMovimiento)
                 .orElseThrow(() -> new ResourceNotFoundException("Movimiento no encontrado"));
+
+        // --- Permisos por rol ---
+        validarPermisosMovimiento(movimiento);
+
+        // --- Capturar datos anteriores para auditoría ---
+        Map<String, Object> datosAnteriores = construirMapaMovimiento(movimiento);
 
         revertirImpactoLotes(movimiento);
 
@@ -343,6 +364,10 @@ public class MovimientoServiceImpl implements MovimientoService {
 
         movimiento.getDetalles().addAll(nuevosDetalles);
         movimientoRepository.save(movimiento);
+
+        // --- Capturar datos nuevos y registrar auditoría ---
+        Map<String, Object> datosNuevos = construirMapaMovimiento(movimiento);
+        auditoriaService.registrar("movimiento_inventario", idMovimiento, "MODIFICAR", datosAnteriores, datosNuevos);
     }
 
     // --- LÓGICA DE AJUSTE DE INVENTARIO ---
@@ -524,4 +549,57 @@ public class MovimientoServiceImpl implements MovimientoService {
         return dto;
     }
 
+    /**
+     * Valida permisos de modificación/eliminación según el rol del usuario.
+     * ALMACENERO: solo puede modificar sus propios movimientos de las últimas 24 horas.
+     * ADMINISTRADOR: puede modificar cualquier movimiento sin restricción.
+     */
+    private void validarPermisosMovimiento(MovimientoInventario movimiento) {
+        TenantUserDetails userDetails = (TenantUserDetails) SecurityContextHolder
+                .getContext().getAuthentication().getPrincipal();
+        String rol = userDetails.getAuthorities().iterator().next().getAuthority()
+                .replace("ROLE_", "");
+
+        if ("ALMACENERO".equals(rol)) {
+            // Solo puede modificar movimientos de las últimas 24 horas
+            OffsetDateTime limite = OffsetDateTime.now().minusHours(24);
+            if (movimiento.getFechaMovimiento().isBefore(limite)) {
+                throw new IllegalStateException("Solo puedes modificar movimientos de las últimas 24 horas");
+            }
+            // Solo puede modificar sus propios movimientos
+            if (!movimiento.getUsuario().getIdUsuario().equals(userDetails.getIdUsuario())) {
+                throw new IllegalStateException("Solo puedes modificar tus propios movimientos");
+            }
+        }
+        // ADMINISTRADOR puede modificar cualquier movimiento sin restricción
+    }
+
+    /**
+     * Construye un Map con los datos relevantes de un movimiento para auditoría.
+     */
+    private Map<String, Object> construirMapaMovimiento(MovimientoInventario movimiento) {
+        Map<String, Object> mapa = new LinkedHashMap<>();
+        mapa.put("idMovimiento", movimiento.getIdMovimiento());
+        mapa.put("tipoMovimiento", movimiento.getTipoMovimiento());
+        mapa.put("motivo", movimiento.getMotivo());
+        mapa.put("fechaMovimiento", movimiento.getFechaMovimiento() != null
+                ? movimiento.getFechaMovimiento().toString() : null);
+        mapa.put("idUsuario", movimiento.getUsuario() != null
+                ? movimiento.getUsuario().getIdUsuario() : null);
+
+        List<Map<String, Object>> detallesMap = new ArrayList<>();
+        if (movimiento.getDetalles() != null) {
+            for (DetalleMovimiento d : movimiento.getDetalles()) {
+                Map<String, Object> detMap = new LinkedHashMap<>();
+                detMap.put("idProducto", d.getProducto() != null ? d.getProducto().getIdProducto() : null);
+                detMap.put("nombreProducto", d.getProducto() != null ? d.getProducto().getNombreProducto() : null);
+                detMap.put("cantidad", d.getCantidad());
+                detMap.put("precioVenta", d.getPrecioVenta());
+                detMap.put("precioCompra", d.getPrecioCompra());
+                detallesMap.add(detMap);
+            }
+        }
+        mapa.put("detalles", detallesMap);
+        return mapa;
+    }
 }
