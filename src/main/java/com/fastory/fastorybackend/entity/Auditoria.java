@@ -1,6 +1,8 @@
 package com.fastory.fastorybackend.entity;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 import java.time.OffsetDateTime;
 
 /**
@@ -31,9 +33,11 @@ public class Auditoria {
     @Column(name = "accion", nullable = false, length = 20)
     private String accion;
 
+    @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "datos_anteriores", columnDefinition = "jsonb")
     private String datosAnteriores;
 
+    @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "datos_nuevos", columnDefinition = "jsonb")
     private String datosNuevos;
 
