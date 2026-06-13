@@ -5,6 +5,7 @@ import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SignatureException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
@@ -15,12 +16,19 @@ public class JwtUtil {
 
     private static final Logger logger = LoggerFactory.getLogger(JwtUtil.class);
 
-    // 🔸 IMPORTANTE: Usar una clave más segura en producción (32+ caracteres)
-    private final String SECRET_KEY = "4ac90015dd2bb457b254f0ad7911ed10_EXTENDED_SECRET_KEY_FOR_SECURITY";
-    private final long EXPIRATION_TIME = 1000 * 60 * 60; // 1 hora
+    @Value("${jwt.secret}")
+    private String secretKey;
+
+    @Value("${jwt.expiration}")
+    private long expirationTime;
 
     private Key getSigningKey() {
-        return Keys.hmacShaKeyFor(SECRET_KEY.getBytes());
+        // Asegurar que la clave tenga al menos 32 bytes para HS256
+        String paddedKey = secretKey;
+        while (paddedKey.getBytes().length < 32) {
+            paddedKey = paddedKey + paddedKey;
+        }
+        return Keys.hmacShaKeyFor(paddedKey.getBytes());
     }
 
     /**
@@ -34,7 +42,7 @@ public class JwtUtil {
                 .claim("idEmpresa", idEmpresa)
                 .claim("nombreEmpresa", nombreEmpresa)
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
+                .setExpiration(new Date(System.currentTimeMillis() + expirationTime))
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)
                 .compact();
     }

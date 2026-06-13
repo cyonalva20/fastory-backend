@@ -30,7 +30,6 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/productos")
-@CrossOrigin(origins = "*")
 @lombok.RequiredArgsConstructor
 public class ProductoController {
 
