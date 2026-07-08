@@ -22,7 +22,6 @@ import com.fastory.fastorybackend.repository.UsuarioRepository;
 import com.fastory.fastorybackend.service.CategoriaService;
 import com.fastory.fastorybackend.service.UbicacionService;
 
-import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -80,9 +79,9 @@ class ProductoServiceImplTest {
         productoArroz.setUnidadMedida("kg");
         productoArroz.setStock(100);
         productoArroz.setStockMinimo(10);
-        productoArroz.setPrecioCompra(new BigDecimal("3.50"));
-        productoArroz.setPrecioVenta(new BigDecimal("5.00"));
-        productoArroz.setEsPerecible(false);
+        productoArroz.setPrecioCompra(3.50);
+        productoArroz.setPrecioVenta(5.00);
+        productoArroz.setPerecible(false);
         productoArroz.setCategoria(categoriaAlimentos);
 
         productoLeche = new Producto();
@@ -91,9 +90,9 @@ class ProductoServiceImplTest {
         productoLeche.setUnidadMedida("litro");
         productoLeche.setStock(50);
         productoLeche.setStockMinimo(20);
-        productoLeche.setPrecioCompra(new BigDecimal("4.00"));
-        productoLeche.setPrecioVenta(new BigDecimal("6.50"));
-        productoLeche.setEsPerecible(true);
+        productoLeche.setPrecioCompra(4.00);
+        productoLeche.setPrecioVenta(6.50);
+        productoLeche.setPerecible(true);
         productoLeche.setCategoria(categoriaAlimentos);
     }
 
@@ -150,7 +149,7 @@ class ProductoServiceImplTest {
         // Assert
         assertTrue(resultado.isPresent());
         assertEquals("Arroz Extra", resultado.get().getNombreProducto());
-        assertEquals(new BigDecimal("5.00"), resultado.get().getPrecioVenta());
+        assertEquals(5.00, resultado.get().getPrecioVenta());
         verify(productoRepository, times(1)).findById(1);
     }
 
@@ -229,7 +228,7 @@ class ProductoServiceImplTest {
     void actualizar_productoExistente_actualizaCorrectamente() {
         // Arrange
         when(productoRepository.existsById(1)).thenReturn(true);
-        productoArroz.setPrecioVenta(new BigDecimal("7.00"));
+        productoArroz.setPrecioVenta(7.00);
         when(productoRepository.save(productoArroz)).thenReturn(productoArroz);
 
         // Act
@@ -237,7 +236,7 @@ class ProductoServiceImplTest {
 
         // Assert
         assertNotNull(resultado);
-        assertEquals(new BigDecimal("7.00"), resultado.getPrecioVenta());
+        assertEquals(7.00, resultado.getPrecioVenta());
         verify(productoRepository).existsById(1);
         verify(productoRepository).save(productoArroz);
     }

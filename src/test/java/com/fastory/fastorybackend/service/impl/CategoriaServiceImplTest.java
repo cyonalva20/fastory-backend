@@ -11,7 +11,6 @@ import com.fastory.fastorybackend.entity.Categoria;
 import com.fastory.fastorybackend.entity.Producto;
 import com.fastory.fastorybackend.exception.ResourceNotFoundException;
 import com.fastory.fastorybackend.repository.CategoriaRepository;
-import com.fastory.fastorybackend.repository.EmpresaRepository;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -24,8 +23,6 @@ import static org.mockito.Mockito.*;
 class CategoriaServiceImplTest {
     @Mock
     private CategoriaRepository categoriaRepository;
-    @Mock
-    private EmpresaRepository empresaRepository;
     @InjectMocks
     private CategoriaServiceImpl categoriaService;
     private Categoria categoriaElectronica;
