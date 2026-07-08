@@ -48,3 +48,18 @@ jobs:
           org.sonarsource.scanner.maven:sonar-maven-plugin:sonar 
           -Dsonar.projectKey=fastory-backend 
           -Dsonar.projectName='fastory-backend'
+
+  # Etapa de Continuous Delivery (CD)
+  docker-delivery:
+    name: Continuous Delivery (Construcción de Imagen Docker)
+    runs-on: ubuntu-latest
+    needs: build-test-analyze # Solo se ejecuta si el CI pasa exitosamente
+
+    steps:
+      - name: Checkout del repositorio
+        uses: actions/checkout@v4
+
+      - name: Construir Imagen Docker (Listo para Producción)
+        run: docker build -t fastory-backend:latest .
+        # Aquí irían los comandos para subir a AWS ECR o Docker Hub:
+        # run: docker push miorganizacion/fastory-backend:latest
