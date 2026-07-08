@@ -1,7 +1,7 @@
 # ----------------------------------------------------------------------
 # ETAPA 1: BUILD (Compilación)
 # Utilizamos la imagen oficial y recomendada de Eclipse Temurin JDK 17.
-FROM eclipse-temurin:17-jdk-jammy AS build
+FROM eclipse-temurin:21-jdk-jammy AS build
 
 # Directorio de trabajo dentro del contenedor
 WORKDIR /app
@@ -26,7 +26,7 @@ RUN ./mvnw clean package -DskipTests && mv target/*.jar target/app.jar
 
 # ETAPA 2: RUNTIME (Ejecución)
 # Usamos Eclipse Temurin JRE 17, una imagen ligera para la ejecución final.
-FROM eclipse-temurin:17-jre-jammy
+FROM eclipse-temurin:21-jre-jammy
 
 # Directorio de trabajo
 WORKDIR /app
