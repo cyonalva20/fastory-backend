@@ -5,17 +5,15 @@ public class LoginResponse {
     private String rol;
     private String token; // null por el momento hasta implementar JWT
     private Integer idUsuario;
-    private Integer idEmpresa;
 
     public LoginResponse() {
     }
 
-    public LoginResponse(String message, String rol, String token, Integer idUsuario, Integer idEmpresa) {
+    public LoginResponse(String message, String rol, String token, Integer idUsuario) {
         this.message = message;
         this.rol = rol;
         this.token = token;
-        this.idUsuario = idUsuario;
-        this.idEmpresa = idEmpresa;
+        this.idUsuario = idUsuario; // <-- AÑADIDO
     }
 
     public String getMessage() {
@@ -49,14 +47,6 @@ public class LoginResponse {
 
     public void setIdUsuario(Integer idUsuario) {
         this.idUsuario = idUsuario;
-    }
-
-    public Integer getIdEmpresa() {
-        return idEmpresa;
-    }
-
-    public void setIdEmpresa(Integer idEmpresa) {
-        this.idEmpresa = idEmpresa;
     }
 
 }

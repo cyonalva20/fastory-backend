@@ -1,7 +1,6 @@
 package com.fastory.fastorybackend.dto;
 
 import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
 
 public class ReportesAnaliticosDto {
 
@@ -31,6 +30,6 @@ public class ReportesAnaliticosDto {
 
         Integer getCantidadRecibida();
 
-        OffsetDateTime getFechaEntrada();
+        LocalDateTime getFechaEntrada();
     }
 }

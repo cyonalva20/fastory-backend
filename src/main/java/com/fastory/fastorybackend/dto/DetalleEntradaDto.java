@@ -1,14 +1,14 @@
 package com.fastory.fastorybackend.dto;
 
-import java.math.BigDecimal;
-import java.time.OffsetDateTime;
+import java.time.LocalDateTime;
 
 public class DetalleEntradaDto {
     private Integer idProducto;
     private Integer cantidad;
-    private BigDecimal precioCompra;
-    private BigDecimal precioVenta;
-    private OffsetDateTime fechaVencimiento;
+    private Double precioCompra;
+    private Double precioVenta;
+    private LocalDateTime fechaVencimiento;
+    private String observacionDetalle; // <-- AÑADIDO
 
     // Getters y Setters
     public Integer getIdProducto() {
@@ -27,27 +27,35 @@ public class DetalleEntradaDto {
         this.cantidad = cantidad;
     }
 
-    public BigDecimal getPrecioCompra() {
+    public Double getPrecioCompra() {
         return precioCompra;
     }
 
-    public void setPrecioCompra(BigDecimal precioCompra) {
+    public void setPrecioCompra(Double precioCompra) {
         this.precioCompra = precioCompra;
     }
 
-    public BigDecimal getPrecioVenta() {
+    public Double getPrecioVenta() {
         return precioVenta;
     }
 
-    public void setPrecioVenta(BigDecimal precioVenta) {
+    public void setPrecioVenta(Double precioVenta) {
         this.precioVenta = precioVenta;
     }
 
-    public OffsetDateTime getFechaVencimiento() {
+    public LocalDateTime getFechaVencimiento() {
         return fechaVencimiento;
     }
 
-    public void setFechaVencimiento(OffsetDateTime fechaVencimiento) {
+    public void setFechaVencimiento(LocalDateTime fechaVencimiento) {
         this.fechaVencimiento = fechaVencimiento;
+    }
+
+    public String getObservacionDetalle() {
+        return observacionDetalle;
+    } // <-- AÑADIDO (CORRIGE ERROR)
+
+    public void setObservacionDetalle(String observacionDetalle) {
+        this.observacionDetalle = observacionDetalle;
     }
 }

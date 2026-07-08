@@ -1,27 +1,25 @@
 package com.fastory.fastorybackend.dto;
 
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
-import java.time.OffsetDateTime;
+import java.time.LocalDate;
+import java.time.LocalTime;
 
 public class DevolucionCreateDto {
 
-    @NotNull(message = "El producto es obligatorio")
+    @NotNull
     private Integer idProducto;
 
-    @NotNull(message = "El lote es obligatorio")
-    private Integer idLote;
+    @NotNull
+    private Integer idLote; // ID del lote que se va a devolver
 
-    @NotNull(message = "El proveedor es obligatorio")
-    private Integer idProveedor;
-
-    @NotNull(message = "La cantidad es obligatoria")
-    @Positive(message = "La cantidad debe ser mayor a cero")
+    @NotNull
     private Integer cantidad;
 
-    private String motivo;
+    @NotNull
+    private LocalDate fechaRecepcion;
 
-    private OffsetDateTime fechaEntrega;
+    @NotNull
+    private LocalTime horaRecepcion;
 
     // Getters y Setters
     public Integer getIdProducto() {
@@ -40,14 +38,6 @@ public class DevolucionCreateDto {
         this.idLote = idLote;
     }
 
-    public Integer getIdProveedor() {
-        return idProveedor;
-    }
-
-    public void setIdProveedor(Integer idProveedor) {
-        this.idProveedor = idProveedor;
-    }
-
     public Integer getCantidad() {
         return cantidad;
     }
@@ -56,19 +46,19 @@ public class DevolucionCreateDto {
         this.cantidad = cantidad;
     }
 
-    public String getMotivo() {
-        return motivo;
+    public LocalDate getFechaRecepcion() {
+        return fechaRecepcion;
     }
 
-    public void setMotivo(String motivo) {
-        this.motivo = motivo;
+    public void setFechaRecepcion(LocalDate fechaRecepcion) {
+        this.fechaRecepcion = fechaRecepcion;
     }
 
-    public OffsetDateTime getFechaEntrega() {
-        return fechaEntrega;
+    public LocalTime getHoraRecepcion() {
+        return horaRecepcion;
     }
 
-    public void setFechaEntrega(OffsetDateTime fechaEntrega) {
-        this.fechaEntrega = fechaEntrega;
+    public void setHoraRecepcion(LocalTime horaRecepcion) {
+        this.horaRecepcion = horaRecepcion;
     }
 }

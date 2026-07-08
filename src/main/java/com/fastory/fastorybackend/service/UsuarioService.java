@@ -14,8 +14,6 @@ public interface UsuarioService {
 
     Usuario registrarUsuario(Usuario usuario); // Mantenemos el original para AuthController
 
-    void registrarOnboarding(com.fastory.fastorybackend.dto.RegistroRequest request); // Para SaaS onboarding
-
     UsuarioDto crearUsuario(UsuarioRequestDto request); // Nuevo para admin
 
     UsuarioDto actualizarUsuario(Integer id, UsuarioRequestDto request);
