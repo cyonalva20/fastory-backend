@@ -1,4 +1,4 @@
-name: CI/CD Pipeline - Fastory Backend
+name: CI/CD Pipeline Fastory Backend
 
 on:
   push:
