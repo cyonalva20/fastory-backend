@@ -1,11 +1,11 @@
 package com.fastory.fastorybackend.service.impl;
 
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import com.fastory.fastorybackend.config.TenantUserDetails;
 import com.fastory.fastorybackend.entity.Usuario;
 import com.fastory.fastorybackend.repository.UsuarioRepository;
 
@@ -22,9 +22,11 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         Usuario usuario = usuarioRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado"));
 
-        return new User(
+        return new TenantUserDetails(
                 usuario.getUsername(),
                 usuario.getPassword(),
-                Collections.singleton(() -> "ROLE_" + usuario.getRol().getNombreRol().toUpperCase()));
+                Collections.singleton(() -> "ROLE_" + usuario.getRol().getNombreRol().toUpperCase()),
+                usuario.getIdEmpresa(),
+                usuario.getIdUsuario());
     }
 }

@@ -1,12 +1,14 @@
 package com.fastory.fastorybackend.entity;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.Filter;
 
 @Entity
 @Table(name = "ubicacion", uniqueConstraints = {
-        @UniqueConstraint(columnNames = { "id_repisa", "fila", "columna" })
+        @UniqueConstraint(name = "uq_ubicacion_tenant", columnNames = {"id_repisa", "fila", "columna"})
 })
-public class Ubicacion {
+@Filter(name = "tenantFilter", condition = "id_empresa = :empresaId")
+public class Ubicacion extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,11 +25,14 @@ public class Ubicacion {
     @Column(name = "columna", nullable = false)
     private Integer columna;
 
-    @Column(name = "estado", length = 20)
-    private String estado;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "estado", nullable = false, length = 20)
+    private EstadoUbicacion estado = EstadoUbicacion.LIBRE;
 
     public Ubicacion() {
     }
+
+    // --- Getters y Setters ---
 
     public Integer getIdUbicacion() {
         return idUbicacion;
@@ -61,11 +66,11 @@ public class Ubicacion {
         this.columna = columna;
     }
 
-    public String getEstado() {
+    public EstadoUbicacion getEstado() {
         return estado;
     }
 
-    public void setEstado(String estado) {
+    public void setEstado(EstadoUbicacion estado) {
         this.estado = estado;
     }
 }

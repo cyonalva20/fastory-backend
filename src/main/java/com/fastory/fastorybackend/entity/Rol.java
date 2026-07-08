@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "Rol")
+@Table(name = "rol")
 public class Rol {
 
     @Id
@@ -18,7 +18,7 @@ public class Rol {
     @Column(name = "nombre_rol", nullable = false, unique = true, length = 50)
     private String nombreRol;
 
-    @Column(name = "descripción", length = 255)
+    @Column(name = "descripcion", length = 255)
     private String descripcion;
 
     @OneToMany(mappedBy = "rol")

@@ -5,6 +5,7 @@ import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SignatureException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
@@ -15,20 +16,33 @@ public class JwtUtil {
 
     private static final Logger logger = LoggerFactory.getLogger(JwtUtil.class);
 
-    // 🔸 IMPORTANTE: Usar una clave más segura en producción (32+ caracteres)
-    private final String SECRET_KEY = "4ac90015dd2bb457b254f0ad7911ed10_EXTENDED_SECRET_KEY_FOR_SECURITY";
-    private final long EXPIRATION_TIME = 1000 * 60 * 60; // 1 hora
+    @Value("${jwt.secret}")
+    private String secretKey;
+
+    @Value("${jwt.expiration}")
+    private long expirationTime;
 
     private Key getSigningKey() {
-        return Keys.hmacShaKeyFor(SECRET_KEY.getBytes());
+        // Asegurar que la clave tenga al menos 32 bytes para HS256
+        String paddedKey = secretKey;
+        while (paddedKey.getBytes().length < 32) {
+            paddedKey = paddedKey + paddedKey;
+        }
+        return Keys.hmacShaKeyFor(paddedKey.getBytes());
     }
 
-    public String generarToken(String username, String rol) {
+    /**
+     * Genera un JWT que incluye username, rol e idEmpresa como claims.
+     * El idEmpresa es esencial para el filtro de tenant en cada request.
+     */
+    public String generarToken(String username, String rol, Integer idEmpresa, String nombreEmpresa) {
         return Jwts.builder()
                 .setSubject(username)
                 .claim("rol", rol)
+                .claim("idEmpresa", idEmpresa)
+                .claim("nombreEmpresa", nombreEmpresa)
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
+                .setExpiration(new Date(System.currentTimeMillis() + expirationTime))
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
@@ -43,6 +57,24 @@ public class JwtUtil {
                     .getSubject();
         } catch (JwtException e) {
             logger.error("Error al obtener username del token: " + e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * Extrae el idEmpresa (tenant) del token JWT.
+     * Retorna null si el token no contiene el claim o es inválido.
+     */
+    public Integer obtenerIdEmpresa(String token) {
+        try {
+            Claims claims = Jwts.parserBuilder()
+                    .setSigningKey(getSigningKey())
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
+            return claims.get("idEmpresa", Integer.class);
+        } catch (JwtException e) {
+            logger.error("Error al obtener idEmpresa del token: " + e.getMessage());
             return null;
         }
     }

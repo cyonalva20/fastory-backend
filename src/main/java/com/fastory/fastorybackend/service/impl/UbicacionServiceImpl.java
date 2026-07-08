@@ -3,17 +3,22 @@ package com.fastory.fastorybackend.service.impl;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import org.springframework.security.core.context.SecurityContextHolder;
+import com.fastory.fastorybackend.config.TenantUserDetails;
 import com.fastory.fastorybackend.dto.AsignarUbicacionDto;
 import com.fastory.fastorybackend.dto.RepisaCreateDto;
 import com.fastory.fastorybackend.dto.RepisaDetalleDto;
 import com.fastory.fastorybackend.dto.UbicacionDto;
+import com.fastory.fastorybackend.entity.EstadoUbicacion;
 import com.fastory.fastorybackend.entity.Producto;
 import com.fastory.fastorybackend.entity.Repisa;
 import com.fastory.fastorybackend.entity.Ubicacion;
+import com.fastory.fastorybackend.entity.Empresa;
 import com.fastory.fastorybackend.exception.ResourceNotFoundException;
 import com.fastory.fastorybackend.repository.ProductoRepository;
 import com.fastory.fastorybackend.repository.RepisaRepository;
 import com.fastory.fastorybackend.repository.UbicacionRepository;
+import com.fastory.fastorybackend.repository.EmpresaRepository;
 import com.fastory.fastorybackend.service.UbicacionService;
 
 import java.util.ArrayList;
@@ -30,6 +35,8 @@ public class UbicacionServiceImpl implements UbicacionService {
 
     private final ProductoRepository productoRepository;
 
+    private final EmpresaRepository empresaRepository;
+
     @Override
     @Transactional
     public void crearRepisaYGenerarUbicaciones(RepisaCreateDto repisaCreateDto) {
@@ -38,7 +45,16 @@ public class UbicacionServiceImpl implements UbicacionService {
         }
         Repisa repisa = new Repisa();
         repisa.setCodigo(repisaCreateDto.getCodigo());
-        repisa.setDescripcion(repisaCreateDto.getDescripcion());
+
+        TenantUserDetails userDetails = (TenantUserDetails) SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getPrincipal();
+        Empresa empresa = empresaRepository.findById(userDetails.getIdEmpresa())
+                .orElseThrow(() -> new RuntimeException("Empresa no encontrada"));
+
+        repisa.setEmpresa(empresa);
+        // Campo 'descripcion' eliminado de la entidad Repisa en el nuevo esquema
         Repisa repisaGuardada = repisaRepository.save(repisa);
 
         List<Ubicacion> ubicaciones = new ArrayList<>();
@@ -48,7 +64,8 @@ public class UbicacionServiceImpl implements UbicacionService {
                 ubicacion.setRepisa(repisaGuardada);
                 ubicacion.setFila(i);
                 ubicacion.setColumna(j);
-                ubicacion.setEstado("LIBRE");
+                ubicacion.setEstado(EstadoUbicacion.LIBRE);
+                ubicacion.setEmpresa(empresa);
                 ubicaciones.add(ubicacion);
             }
         }
@@ -72,18 +89,18 @@ public class UbicacionServiceImpl implements UbicacionService {
                         () -> new ResourceNotFoundException("Ubicación no encontrada en la repisa " + repisa.getCodigo()
                                 + ", fila " + asignarDto.getFila() + ", columna " + asignarDto.getColumna()));
 
-        if ("OCUPADA".equals(ubicacion.getEstado())) {
+        if (EstadoUbicacion.OCUPADO.equals(ubicacion.getEstado())) {
             throw new IllegalStateException("La ubicación ya está ocupada.");
         }
 
         // Si el producto ya tenía una ubicación, la liberamos
         if (producto.getUbicacion() != null) {
             Ubicacion ubicacionAntigua = producto.getUbicacion();
-            ubicacionAntigua.setEstado("LIBRE");
+            ubicacionAntigua.setEstado(EstadoUbicacion.LIBRE);
             ubicacionRepository.save(ubicacionAntigua);
         }
 
-        ubicacion.setEstado("OCUPADA");
+        ubicacion.setEstado(EstadoUbicacion.OCUPADO);
         producto.setUbicacion(ubicacion);
 
         Ubicacion ubicacionGuardada = ubicacionRepository.save(ubicacion);
@@ -128,7 +145,7 @@ public class UbicacionServiceImpl implements UbicacionService {
         dto.setIdRepisa(ubicacion.getRepisa().getIdRepisa());
         dto.setFila(ubicacion.getFila());
         dto.setColumna(ubicacion.getColumna());
-        dto.setEstado(ubicacion.getEstado());
+        dto.setEstado(ubicacion.getEstado().name()); // Enum → String for DTO
         return dto;
     }
 }

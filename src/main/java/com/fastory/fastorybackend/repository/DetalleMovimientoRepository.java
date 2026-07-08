@@ -9,7 +9,7 @@ import com.fastory.fastorybackend.entity.DetalleMovimiento;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 
 @Repository
@@ -27,12 +27,10 @@ public interface DetalleMovimientoRepository extends JpaRepository<DetalleMovimi
                         "GROUP BY p.idProducto, p.nombreProducto, c.nombreCategoria " +
                         "ORDER BY cantidadVendida DESC")
         List<ReportesAnaliticosDto.ProductoMasVendidoProjection> findProductosMasVendidos(
-                        @Param("inicio") LocalDateTime inicio,
-                        @Param("fin") LocalDateTime fin);
+                        @Param("inicio") OffsetDateTime inicio,
+                        @Param("fin") OffsetDateTime fin);
 
         // 2. Productos con baja rotación (Vendidos poco o nada, pero con stock > 0)
-        // Nota: Esta consulta busca productos que han tenido salidas en el rango, pero
-        // la suma es menor al umbral.
         @Query("SELECT p.nombreProducto as nombreProducto, p.stock as stockActual, COALESCE(SUM(d.cantidad), 0) as cantidadVendida "
                         +
                         "FROM Producto p " +
@@ -40,28 +38,36 @@ public interface DetalleMovimientoRepository extends JpaRepository<DetalleMovimi
                         "LEFT JOIN d.movimientoInventario m ON m.idMovimiento = d.movimientoInventario.idMovimiento " +
                         "AND m.tipoMovimiento = 'SALIDA' " +
                         "AND m.fechaMovimiento BETWEEN :inicio AND :fin " +
-                        "WHERE p.stock > 0 " + // Solo nos interesan productos que ocupan espacio
+                        "WHERE p.stock > 0 " +
                         "GROUP BY p.idProducto, p.nombreProducto, p.stock " +
                         "HAVING COALESCE(SUM(d.cantidad), 0) <= :umbral " +
                         "ORDER BY cantidadVendida ASC")
         List<ReportesAnaliticosDto.ProductoBajaRotacionProjection> findProductosBajaRotacion(
-                        @Param("inicio") LocalDateTime inicio,
-                        @Param("fin") LocalDateTime fin,
+                        @Param("inicio") OffsetDateTime inicio,
+                        @Param("fin") OffsetDateTime fin,
                         @Param("umbral") Long umbral);
 
-        // 3. Entradas por proveedor
+        // 3. Entradas por proveedor (usando el motivo que guarda el nombre)
         @Query("SELECT p.nombreProducto as nombreProducto, l.codigoLote as codigoLote, d.cantidad as cantidadRecibida, m.fechaMovimiento as fechaEntrada "
                         +
                         "FROM DetalleMovimiento d " +
                         "JOIN d.movimientoInventario m " +
                         "JOIN d.producto p " +
-                        "LEFT JOIN Lote l ON l.idLote = d.idLote " +
+                        "LEFT JOIN d.lote l " +
                         "WHERE m.tipoMovimiento = 'ENTRADA' " +
-                        "AND m.proveedor.idProveedor = :idProveedor " +
+                        "AND m.motivo LIKE CONCAT('%', :proveedorMotivo, '%') " +
                         "AND m.fechaMovimiento BETWEEN :inicio AND :fin " +
                         "ORDER BY m.fechaMovimiento DESC")
         List<ReportesAnaliticosDto.EntradaProveedorProjection> findEntradasPorProveedor(
-                        @Param("idProveedor") Integer idProveedor,
-                        @Param("inicio") LocalDateTime inicio,
-                        @Param("fin") LocalDateTime fin);
+                        @Param("proveedorMotivo") String proveedorMotivo,
+                        @Param("inicio") OffsetDateTime inicio,
+                        @Param("fin") OffsetDateTime fin);
+
+        @Query("SELECT COUNT(DISTINCT d.producto.idProducto) " +
+                        "FROM DetalleMovimiento d " +
+                        "JOIN d.movimientoInventario m " +
+                        "WHERE m.tipoMovimiento = 'ENTRADA' " +
+                        "AND m.motivo LIKE CONCAT('%', :proveedorMotivo, '%')")
+        Integer countDistinctProductosByProveedorMotivo(@Param("proveedorMotivo") String proveedorMotivo);
+
 }

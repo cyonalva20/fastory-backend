@@ -13,7 +13,7 @@ import java.util.List;
 public interface LoteRepository extends JpaRepository<Lote, Integer> {
     List<Lote> findByProductoIdProducto(Integer idProducto);
 
-    @Query("SELECT l FROM Lote l WHERE l.producto.idProducto = :idProducto AND l.cantidad > 0 ORDER BY l.fechaVencimiento ASC, l.fechaRegistro ASC")
+    @Query("SELECT l FROM Lote l WHERE l.producto.idProducto = :idProducto AND l.cantidad > 0 ORDER BY l.fechaVencimiento ASC")
     List<Lote> findLotesDisponiblesParaSalida(Integer idProducto);
 
     // Para No Perecibles: Lote con mayor cantidad primero (según requerimiento de

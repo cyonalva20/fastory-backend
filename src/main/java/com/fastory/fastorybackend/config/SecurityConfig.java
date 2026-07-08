@@ -24,6 +24,7 @@ import java.util.Arrays;
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final SuscripcionFilter suscripcionFilter;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -47,32 +48,29 @@ public class SecurityConfig {
                         // 🔸 Autenticación y Recuperación
                         .requestMatchers("/auth/**").permitAll() // Incluye /auth/recovery/**
 
-                        // 🔸 Endpoints públicos de API
-                        .requestMatchers("/api/v1/categorias/**").permitAll()
-                        .requestMatchers("/api/v1/proveedores/**").permitAll()
-                        .requestMatchers("/api/v1/ubicaciones/**").permitAll()
-                        .requestMatchers("/api/v1/movimientos/**").permitAll()
-                        .requestMatchers("/api/v1/devoluciones/pendientes").permitAll()
-                        .requestMatchers("/api/v1/devoluciones").permitAll()
-                        .requestMatchers("/api/v1/reportes/**").permitAll()
+                        // 🔸 Endpoints de API
+                        .requestMatchers("/api/v1/categorias/**").authenticated()
+                        .requestMatchers("/api/v1/proveedores/**").authenticated()
+                        .requestMatchers("/api/v1/ubicaciones/**").authenticated()
+                        .requestMatchers("/api/v1/movimientos/**").authenticated()
+                        .requestMatchers("/api/v1/devoluciones/pendientes").authenticated()
+                        .requestMatchers("/api/v1/devoluciones").authenticated()
+                        .requestMatchers("/api/v1/reportes/**").authenticated()
+                        .requestMatchers("/api/v1/auditoria/**").authenticated()
+                        .requestMatchers("/api/v1/suscripcion/**").authenticated()
 
                         // 🔸 Usuarios y Roles
                         .requestMatchers("/api/v1/usuarios/**").authenticated()
                         .requestMatchers("/api/v1/roles/**").authenticated()
                         .requestMatchers("/api/v1/devoluciones/**").authenticated()
-                        // 🔸 Productos
-                        .requestMatchers(HttpMethod.POST, "/api/productos/registrar").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/productos/inventario").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/productos/filtros").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/productos/detalles/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/productos/alertas").permitAll()
-                        .requestMatchers(HttpMethod.PUT, "/api/productos/actualizar/**").authenticated()
+                        .requestMatchers("/api/productos/**").authenticated()
 
                         // 🔸 Todo lo demás requiere autenticación
                         .anyRequest().authenticated())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
         http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+        http.addFilterAfter(suscripcionFilter, JwtAuthenticationFilter.class);
 
         return http.build();
     }
@@ -83,7 +81,7 @@ public class SecurityConfig {
         cors.setAllowedOriginPatterns(Arrays.asList(
                 "http://localhost:*",
                 "http://127.0.0.1:*",
-                "https://la-espigafrontend.vercel.app"));
+                "https://fastory.com"));
         cors.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         cors.setAllowedHeaders(Arrays.asList("*"));
         cors.setAllowCredentials(true);
