@@ -11,6 +11,9 @@ COPY mvnw .
 COPY .mvn .mvn
 COPY pom.xml .
 
+# Dar permisos de ejecución al wrapper (soluciona error 126 en Linux)
+RUN chmod +x ./mvnw
+
 # Descargar dependencias
 RUN ./mvnw dependency:go-offline -B
 
