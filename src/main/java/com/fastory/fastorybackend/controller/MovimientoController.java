@@ -69,6 +69,16 @@ public class MovimientoController {
     // --- ENDPOINTS DE ENTRADAS (NUEVOS) ---
     // -------------------------------------------------------------------------
 
+    /**
+     * Obtiene los productos filtrados por un proveedor.
+     * URL: GET /api/v1/movimientos/productos/proveedor/{idProveedor}
+     */
+    @GetMapping("/productos/proveedor/{idProveedor}")
+    public ResponseEntity<List<ProductoPorProveedorDto>> obtenerProductosPorProveedor(
+            @PathVariable Integer idProveedor) {
+        List<ProductoPorProveedorDto> productos = movimientoService.obtenerProductosPorProveedor(idProveedor);
+        return ResponseEntity.ok(productos);
+    }
 
     /**
      * Registra una nueva entrada de mercadería.
@@ -117,7 +127,7 @@ public class MovimientoController {
      * Requiere rol ADMIN.
      */
     @PutMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'ALMACENERO')")
+    @PreAuthorize("hasRole('ADMINISTRADOR')")
     public ResponseEntity<Object> actualizarMovimiento(@PathVariable Integer id,
             @Valid @RequestBody MovimientoUpdateDto dto) {
         try {
@@ -135,7 +145,7 @@ public class MovimientoController {
      * Requiere rol ADMIN.
      */
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'ALMACENERO')")
+    @PreAuthorize("hasRole('ADMINISTRADOR')")
     public ResponseEntity<Object> eliminarMovimiento(@PathVariable Integer id) {
         try {
             movimientoService.eliminarMovimiento(id);

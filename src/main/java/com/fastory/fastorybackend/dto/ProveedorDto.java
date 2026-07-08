@@ -3,7 +3,6 @@ package com.fastory.fastorybackend.dto;
 public class ProveedorDto {
     private Integer idProveedor;
     private String nombreProveedor;
-    private String rucProveedor;
     private String telefono;
     private int cantidadProductos;
 
@@ -21,14 +20,6 @@ public class ProveedorDto {
 
     public void setNombreProveedor(String nombreProveedor) {
         this.nombreProveedor = nombreProveedor;
-    }
-
-    public String getRucProveedor() {
-        return rucProveedor;
-    }
-
-    public void setRucProveedor(String rucProveedor) {
-        this.rucProveedor = rucProveedor;
     }
 
     public String getTelefono() {

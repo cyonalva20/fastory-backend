@@ -1,59 +1,83 @@
 package com.fastory.fastorybackend.entity;
 
 import jakarta.persistence.*;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.hibernate.annotations.Filter;
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore; // Importante para evitar recursión infinita
+import java.time.LocalDateTime;
+import java.util.ArrayList; // Import necesario
+import java.util.List; // Import necesario
 
 @Entity
 @Table(name = "producto")
-@Filter(name = "tenantFilter", condition = "id_empresa = :empresaId")
-public class Producto extends BaseEntity {
+public class Producto {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_producto")
     private Integer idProducto;
 
-    @Column(name = "nombre_producto", nullable = false, length = 150)
+    @Column(name = "nombre_producto", nullable = false, length = 100)
     private String nombreProducto;
 
-    @Column(name = "unidad_medida", nullable = false, length = 20)
+    @Column(name = "descripcion_producto")
+    private String descripcionProducto;
+
+    @Column(name = "unidad_medida", nullable = false, length = 50)
     private String unidadMedida;
 
     @Column(name = "stock", nullable = false)
-    private Integer stock = 0;
+    private Integer stock;
 
     @Column(name = "stock_minimo", nullable = false)
-    private Integer stockMinimo = 5;
+    private Integer stockMinimo;
 
-    @Column(name = "precio_compra", nullable = false, precision = 10, scale = 2)
-    private BigDecimal precioCompra;
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    @Column(name = "fecha_vencimiento")
+    private LocalDateTime fechaVencimiento;
 
-    @Column(name = "precio_venta", nullable = false, precision = 10, scale = 2)
-    private BigDecimal precioVenta;
+    @Column(name = "precio_compra", nullable = false)
+    private Double precioCompra;
 
-    @Column(name = "es_perecible", nullable = false)
-    private Boolean esPerecible = false;
+    @Column(name = "precio_venta", nullable = false)
+    private Double precioVenta;
+
+    @Column(name = "marca", length = 100)
+    private String marca;
+
+    @Column(name = "es_perecible")
+    private Boolean perecible;
+
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    @Column(name = "fecha_registro", nullable = false)
+    private LocalDateTime fechaRegistro;
+
+    @PrePersist
+    protected void onCreate() {
+        fechaRegistro = LocalDateTime.now();
+    }
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_categoria", nullable = false)
     private Categoria categoria;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_ubicacion")
+    @OneToOne
+    @JoinColumn(name = "id_ubicacion", unique = true)
     private Ubicacion ubicacion;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_proveedor")
+    private Proveedor proveedor;
+
+    // --- NUEVA RELACIÓN (CORRECCIÓN) ---
+    // Esto permite usar "p.lotes" en las consultas JPQL del repositorio
     @OneToMany(mappedBy = "producto", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JsonIgnore
+    @JsonIgnore // Evita que al serializar el producto se traigan todos sus lotes
+                // automáticamente en JSON
     private List<Lote> lotes = new ArrayList<>();
+    // ------------------------------------
 
     public Producto() {
     }
-
-    // --- Getters y Setters ---
 
     public Integer getIdProducto() {
         return idProducto;
@@ -71,12 +95,44 @@ public class Producto extends BaseEntity {
         this.nombreProducto = nombreProducto;
     }
 
+    public String getDescripcionProducto() {
+        return descripcionProducto;
+    }
+
+    public void setDescripcionProducto(String descripcionProducto) {
+        this.descripcionProducto = descripcionProducto;
+    }
+
     public String getUnidadMedida() {
         return unidadMedida;
     }
 
     public void setUnidadMedida(String unidadMedida) {
         this.unidadMedida = unidadMedida;
+    }
+
+    public Double getPrecioCompra() {
+        return precioCompra;
+    }
+
+    public void setPrecioCompra(Double precioCompra) {
+        this.precioCompra = precioCompra;
+    }
+
+    public String getMarca() {
+        return marca;
+    }
+
+    public void setMarca(String marca) {
+        this.marca = marca;
+    }
+
+    public Boolean getPerecible() {
+        return perecible;
+    }
+
+    public void setPerecible(Boolean esPerecible) {
+        this.perecible = esPerecible;
     }
 
     public Integer getStock() {
@@ -95,28 +151,20 @@ public class Producto extends BaseEntity {
         this.stockMinimo = stockMinimo;
     }
 
-    public BigDecimal getPrecioCompra() {
-        return precioCompra;
+    public LocalDateTime getFechaVencimiento() {
+        return fechaVencimiento;
     }
 
-    public void setPrecioCompra(BigDecimal precioCompra) {
-        this.precioCompra = precioCompra;
+    public void setFechaVencimiento(LocalDateTime fechaVencimiento) {
+        this.fechaVencimiento = fechaVencimiento;
     }
 
-    public BigDecimal getPrecioVenta() {
-        return precioVenta;
+    public LocalDateTime getFechaRegistro() {
+        return fechaRegistro;
     }
 
-    public void setPrecioVenta(BigDecimal precioVenta) {
-        this.precioVenta = precioVenta;
-    }
-
-    public Boolean getEsPerecible() {
-        return esPerecible;
-    }
-
-    public void setEsPerecible(Boolean esPerecible) {
-        this.esPerecible = esPerecible;
+    public void setFechaRegistro(LocalDateTime fechaRegistro) {
+        this.fechaRegistro = fechaRegistro;
     }
 
     public Categoria getCategoria() {
@@ -135,6 +183,23 @@ public class Producto extends BaseEntity {
         this.ubicacion = ubicacion;
     }
 
+    public Proveedor getProveedor() {
+        return proveedor;
+    }
+
+    public void setProveedor(Proveedor proveedor) {
+        this.proveedor = proveedor;
+    }
+
+    public Double getPrecioVenta() {
+        return precioVenta;
+    }
+
+    public void setPrecioVenta(Double precioVenta) {
+        this.precioVenta = precioVenta;
+    }
+
+    // --- GETTER Y SETTER PARA LOTES ---
     public List<Lote> getLotes() {
         return lotes;
     }

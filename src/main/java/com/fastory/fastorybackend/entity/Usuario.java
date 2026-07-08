@@ -1,31 +1,23 @@
 package com.fastory.fastorybackend.entity;
 
 import jakarta.persistence.*;
-import org.hibernate.annotations.Filter;
+import org.antlr.v4.runtime.misc.NotNull;
 
-import java.time.OffsetDateTime;
-import java.util.UUID;
+import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "usuario", uniqueConstraints = {
-        @UniqueConstraint(name = "uq_usuario_tenant", columnNames = {"id_empresa", "username"}),
-        @UniqueConstraint(name = "uq_email_tenant", columnNames = {"id_empresa", "email"})
-})
-@Filter(name = "tenantFilter", condition = "id_empresa = :empresaId")
-public class Usuario extends BaseEntity {
+@Table(name = "Usuario")
+public class Usuario {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_usuario")
     private Integer idUsuario;
 
-    @Column(name = "auth_id", unique = true)
-    private UUID authId;
-
-    @Column(name = "username", nullable = false, length = 255)
+    @Column(name = "username", nullable = false, unique = true, length = 50)
     private String username;
 
-    @Column(name = "password", length = 255)
+    @Column(name = "contraseña", nullable = false, length = 50)
     private String password;
 
     @Column(name = "nombre", nullable = false, length = 100)
@@ -34,32 +26,19 @@ public class Usuario extends BaseEntity {
     @Column(name = "apellido", nullable = false, length = 100)
     private String apellido;
 
-    @Column(name = "email", nullable = false, length = 255)
-    private String email;
-
-    @Column(name = "fecha_ingreso", nullable = false, updatable = false)
-    private OffsetDateTime fechaIngreso;
+    @Column(name = "fecha_ingreso", nullable = false)
+    @NotNull
+    private LocalDateTime fechaIngreso = LocalDateTime.now();
 
     @Column(name = "estado", nullable = false)
     private Boolean estado = true;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @Column(name = "email", nullable = false, unique = true)
+    private String email;
+
+    @ManyToOne
     @JoinColumn(name = "id_rol", nullable = false)
     private Rol rol;
-
-    @PrePersist
-    @Override
-    protected void onBaseCreate() {
-        super.onBaseCreate();
-        if (fechaIngreso == null) {
-            fechaIngreso = OffsetDateTime.now();
-        }
-    }
-
-    public Usuario() {
-    }
-
-    // --- Getters y Setters ---
 
     public Integer getIdUsuario() {
         return idUsuario;
@@ -67,14 +46,6 @@ public class Usuario extends BaseEntity {
 
     public void setIdUsuario(Integer idUsuario) {
         this.idUsuario = idUsuario;
-    }
-
-    public UUID getAuthId() {
-        return authId;
-    }
-
-    public void setAuthId(UUID authId) {
-        this.authId = authId;
     }
 
     public String getUsername() {
@@ -109,19 +80,11 @@ public class Usuario extends BaseEntity {
         this.apellido = apellido;
     }
 
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public OffsetDateTime getFechaIngreso() {
+    public LocalDateTime getFechaIngreso() {
         return fechaIngreso;
     }
 
-    public void setFechaIngreso(OffsetDateTime fechaIngreso) {
+    public void setFechaIngreso(LocalDateTime fechaIngreso) {
         this.fechaIngreso = fechaIngreso;
     }
 
@@ -139,5 +102,13 @@ public class Usuario extends BaseEntity {
 
     public void setRol(Rol rol) {
         this.rol = rol;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 }

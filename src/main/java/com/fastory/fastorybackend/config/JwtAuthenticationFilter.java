@@ -29,7 +29,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private static final List<String> PUBLIC_URLS = Arrays.asList(
             "/auth/login",
             "/auth/register",
-            "/auth/");
+            "/auth/",
+            "/api/v1/categorias",
+            "/api/v1/proveedores",
+            "/api/v1/ubicaciones",
+            "/api/productos/registrar",
+            "/api/productos/inventario",
+            "/api/productos/filtros",
+            "/api/productos/detalles");
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
