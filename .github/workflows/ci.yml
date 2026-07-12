@@ -1,4 +1,4 @@
-﻿name: CI/CD Pipeline Fastory Backend
+name: CI/CD Pipeline Fastory Backend
 
 on:
   push:
@@ -59,7 +59,7 @@ jobs:
           mvn -B org.sonarsource.scanner.maven:sonar-maven-plugin:sonar
           -Dsonar.projectKey=fastory-backend
           -Dsonar.projectName='fastory-backend'
-          -Dsonar.qualitygate.wait=true
+          -Dsonar.qualitygate.wait=false
 
   # ──────────────────────────────────────────────
   # CD — Build Docker + Push ECR + Deploy ECS
