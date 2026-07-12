@@ -68,6 +68,9 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/productos/alertas").permitAll()
                         .requestMatchers(HttpMethod.PUT, "/api/productos/actualizar/**").authenticated()
 
+                        // 🔸 AWS ALB Health Checks (Actuator)
+                        .requestMatchers("/actuator/**").permitAll()
+
                         // 🔸 Todo lo demás requiere autenticación
                         .anyRequest().authenticated())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
