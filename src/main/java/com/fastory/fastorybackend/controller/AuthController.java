@@ -13,12 +13,10 @@ import org.springframework.web.bind.annotation.*;
 import com.fastory.fastorybackend.config.JwtUtil;
 import com.fastory.fastorybackend.dto.LoginRequest;
 import com.fastory.fastorybackend.dto.LoginResponse;
-
+import com.fastory.fastorybackend.entity.Rol;
 import com.fastory.fastorybackend.entity.Usuario;
 import com.fastory.fastorybackend.repository.RolRepository;
 import com.fastory.fastorybackend.repository.UsuarioRepository;
-import com.fastory.fastorybackend.service.UsuarioService;
-import com.fastory.fastorybackend.dto.RegistroRequest;
 
 @RestController
 @RequestMapping("/auth")
@@ -40,9 +38,6 @@ public class AuthController {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    @Autowired
-    private UsuarioService usuarioService;
-
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest request) {
         try {
@@ -53,35 +48,56 @@ public class AuthController {
             Usuario usuario = usuarioRepository.findByUsername(request.getUsername())
                     .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado"));
 
-            String token = jwtUtil.generarToken(usuario.getUsername(), usuario.getRol().getNombreRol(),
-                    usuario.getEmpresa().getIdEmpresa(), usuario.getEmpresa().getNombreComercial());
+            String token = jwtUtil.generarToken(usuario.getUsername(), usuario.getRol().getNombreRol());
 
             LoginResponse response = new LoginResponse(
                     "Inicio de sesión correcto",
                     usuario.getRol().getNombreRol(),
                     token,
-                    usuario.getIdUsuario(),
-                    usuario.getEmpresa().getIdEmpresa());
+                    usuario.getIdUsuario() // <-- AÑADIDO
+            );
 
             return ResponseEntity.ok(response);
 
         } catch (Exception e) {
             return ResponseEntity.status(401).body(
-                    new LoginResponse("Credenciales inválidas", null, null, null, null));
+                    new LoginResponse("Credenciales inválidas", null, null, null));
         }
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody RegistroRequest request) {
+    public ResponseEntity<?> register(@RequestBody Usuario usuario) {
         try {
-            // Validar datos obligatorios básicos
-            if (request.getUsername() == null || request.getPassword() == null || request.getNombreEmpresa() == null) {
-                return ResponseEntity.badRequest().body("Username, password y nombre de empresa son obligatorios");
+            // Validar datos obligatorios
+            if (usuario.getUsername() == null || usuario.getPassword() == null) {
+                return ResponseEntity.badRequest().body("Username y password son obligatorios");
             }
 
-            usuarioService.registrarOnboarding(request);
+            // Validar rol
+            Rol rol;
+            if (usuario.getRol() != null && usuario.getRol().getIdRol() != null) {
+                // Usar el idRol proporcionado en el JSON
+                rol = rolRepository.findById(usuario.getRol().getIdRol())
+                        .orElseThrow(() -> new RuntimeException("Rol no encontrado"));
+            } else {
+                // Usar rol por defecto "USER"
+                rol = rolRepository.findByNombreRol("USER")
+                        .orElseThrow(() -> new RuntimeException("Rol USER no encontrado"));
+            }
 
-            return ResponseEntity.ok("Empresa y usuario administrador registrados correctamente");
+            // Encriptar la contraseña antes de guardar
+            usuario.setPassword(passwordEncoder.encode(usuario.getPassword()));
+
+            // Establecer relación bidireccional de manera segura
+            usuario.setRol(rol);
+            if (rol.getUsuarios() != null) {
+                rol.getUsuarios().add(usuario);
+            }
+
+            // Guardar usuario
+            usuarioRepository.save(usuario);
+
+            return ResponseEntity.ok("Usuario registrado correctamente");
 
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)

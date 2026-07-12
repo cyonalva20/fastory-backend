@@ -1,13 +1,13 @@
 package com.fastory.fastorybackend.entity;
 
 import jakarta.persistence.*;
-import org.hibernate.annotations.Filter;
-import java.time.OffsetDateTime;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 @Entity
 @Table(name = "devolucion")
-@Filter(name = "tenantFilter", condition = "id_empresa = :empresaId")
-public class Devolucion extends BaseEntity {
+public class Devolucion {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,36 +22,28 @@ public class Devolucion extends BaseEntity {
     @JoinColumn(name = "id_proveedor", nullable = false)
     private Proveedor proveedor;
 
+    // Guardamos el código del lote vencido como referencia histórica
+    // No relacionamos directamente la entidad Lote porque el lote podría ser
+    // eliminado o vaciado
+    @Column(name = "codigo_lote_vencido")
+    private String codigoLoteVencido;
+
     @Column(name = "cantidad", nullable = false)
     private Integer cantidad;
 
-    @Column(name = "motivo", columnDefinition = "TEXT")
-    private String motivo;
+    @Column(name = "fecha_solicitud", nullable = false)
+    private LocalDateTime fechaSolicitud = LocalDateTime.now();
 
-    @Column(name = "estado", nullable = false, length = 20)
-    private String estado = "PENDIENTE";
+    @Column(name = "fecha_recepcion_programada", nullable = false)
+    private LocalDate fechaRecepcionProgramada;
 
-    @Column(name = "fecha_solicitud")
-    private OffsetDateTime fechaSolicitud;
+    @Column(name = "hora_recepcion_programada", nullable = false)
+    private LocalTime horaRecepcionProgramada;
 
-    @Column(name = "fecha_entrega")
-    private OffsetDateTime fechaEntrega;
+    @Column(name = "estado", nullable = false) // PENDIENTE, COMPLETADA
+    private String estado;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_movimiento_ref")
-    private MovimientoInventario movimientoRef;
-
-    @PrePersist
-    @Override
-    protected void onBaseCreate() {
-        super.onBaseCreate();
-        if (fechaSolicitud == null) {
-            fechaSolicitud = OffsetDateTime.now();
-        }
-    }
-
-    // --- Getters y Setters ---
-
+    // Getters y Setters
     public Integer getIdDevolucion() {
         return idDevolucion;
     }
@@ -76,6 +68,14 @@ public class Devolucion extends BaseEntity {
         this.proveedor = proveedor;
     }
 
+    public String getCodigoLoteVencido() {
+        return codigoLoteVencido;
+    }
+
+    public void setCodigoLoteVencido(String codigoLoteVencido) {
+        this.codigoLoteVencido = codigoLoteVencido;
+    }
+
     public Integer getCantidad() {
         return cantidad;
     }
@@ -84,12 +84,28 @@ public class Devolucion extends BaseEntity {
         this.cantidad = cantidad;
     }
 
-    public String getMotivo() {
-        return motivo;
+    public LocalDateTime getFechaSolicitud() {
+        return fechaSolicitud;
     }
 
-    public void setMotivo(String motivo) {
-        this.motivo = motivo;
+    public void setFechaSolicitud(LocalDateTime fechaSolicitud) {
+        this.fechaSolicitud = fechaSolicitud;
+    }
+
+    public LocalDate getFechaRecepcionProgramada() {
+        return fechaRecepcionProgramada;
+    }
+
+    public void setFechaRecepcionProgramada(LocalDate fechaRecepcionProgramada) {
+        this.fechaRecepcionProgramada = fechaRecepcionProgramada;
+    }
+
+    public LocalTime getHoraRecepcionProgramada() {
+        return horaRecepcionProgramada;
+    }
+
+    public void setHoraRecepcionProgramada(LocalTime horaRecepcionProgramada) {
+        this.horaRecepcionProgramada = horaRecepcionProgramada;
     }
 
     public String getEstado() {
@@ -98,29 +114,5 @@ public class Devolucion extends BaseEntity {
 
     public void setEstado(String estado) {
         this.estado = estado;
-    }
-
-    public OffsetDateTime getFechaSolicitud() {
-        return fechaSolicitud;
-    }
-
-    public void setFechaSolicitud(OffsetDateTime fechaSolicitud) {
-        this.fechaSolicitud = fechaSolicitud;
-    }
-
-    public OffsetDateTime getFechaEntrega() {
-        return fechaEntrega;
-    }
-
-    public void setFechaEntrega(OffsetDateTime fechaEntrega) {
-        this.fechaEntrega = fechaEntrega;
-    }
-
-    public MovimientoInventario getMovimientoRef() {
-        return movimientoRef;
-    }
-
-    public void setMovimientoRef(MovimientoInventario movimientoRef) {
-        this.movimientoRef = movimientoRef;
     }
 }

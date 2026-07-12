@@ -4,7 +4,6 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
-import java.math.BigDecimal;
 
 /**
  * DTO específico para actualizar un producto.
@@ -18,11 +17,11 @@ public class ProductoUpdateDto {
 
     @NotNull(message = "El precio de compra es obligatorio")
     @Positive(message = "El precio de compra debe ser mayor a cero")
-    private BigDecimal precioCompra;
+    private Double precioCompra;
 
     @NotNull(message = "El precio de venta es obligatorio")
     @Positive(message = "El precio de venta debe ser mayor al precio de compra")
-    private BigDecimal precioVenta;
+    private Double precioVenta;
 
     @NotNull(message = "Debe seleccionar una categoría")
     private Integer idCategoria;
@@ -30,6 +29,14 @@ public class ProductoUpdateDto {
     @NotNull(message = "El stock mínimo es obligatorio")
     @Positive(message = "El stock mínimo debe ser mayor a cero")
     private Integer stockMinimo;
+
+    @Size(max = 500, message = "La descripción no debe superar los 500 caracteres")
+    private String descripcion;
+
+    // --- CAMPO AÑADIDO ---
+    @Size(max = 100, message = "La marca no debe superar los 100 caracteres.")
+    private String marca;
+    // --------------------
 
     private Integer idRepisa;
 
@@ -52,19 +59,19 @@ public class ProductoUpdateDto {
         this.nombreProducto = nombreProducto;
     }
 
-    public BigDecimal getPrecioCompra() {
+    public Double getPrecioCompra() {
         return precioCompra;
     }
 
-    public void setPrecioCompra(BigDecimal precioCompra) {
+    public void setPrecioCompra(Double precioCompra) {
         this.precioCompra = precioCompra;
     }
 
-    public BigDecimal getPrecioVenta() {
+    public Double getPrecioVenta() {
         return precioVenta;
     }
 
-    public void setPrecioVenta(BigDecimal precioVenta) {
+    public void setPrecioVenta(Double precioVenta) {
         this.precioVenta = precioVenta;
     }
 
@@ -82,6 +89,23 @@ public class ProductoUpdateDto {
 
     public void setStockMinimo(Integer stockMinimo) {
         this.stockMinimo = stockMinimo;
+    }
+
+    public String getDescripcion() {
+        return descripcion;
+    }
+
+    public void setDescripcion(String descripcion) {
+        this.descripcion = descripcion;
+    }
+
+    // --- GETTER Y SETTER AÑADIDOS ---
+    public String getMarca() {
+        return marca;
+    }
+
+    public void setMarca(String marca) {
+        this.marca = marca;
     }
 
     public Integer getIdRepisa() {

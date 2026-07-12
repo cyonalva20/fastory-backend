@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 
 import com.fastory.fastorybackend.entity.MovimientoInventario;
 
-import java.time.OffsetDateTime;
+import java.time.LocalDateTime;
 import java.util.List;
 
 // Repositorios para Movimiento y Detalle
@@ -22,7 +22,7 @@ public interface MovimientoInventarioRepository extends JpaRepository<Movimiento
                         "AND (CAST(:fechaFin AS timestamp) IS NULL OR m.fechaMovimiento <= :fechaFin) " +
                         "ORDER BY m.fechaMovimiento DESC")
         List<MovimientoInventario> buscarPorFiltros(
-                        @Param("fechaInicio") OffsetDateTime fechaInicio,
-                        @Param("fechaFin") OffsetDateTime fechaFin,
+                        @Param("fechaInicio") LocalDateTime fechaInicio,
+                        @Param("fechaFin") LocalDateTime fechaFin,
                         @Param("tipo") String tipo);
 }

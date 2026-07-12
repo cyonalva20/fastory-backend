@@ -1,27 +1,24 @@
 package com.fastory.fastorybackend.dto;
 
-import java.math.BigDecimal;
-
 // Este DTO es para la tabla principal del Index.tsx
 public class ProductoInventarioDto {
 
     private Integer idProducto;
     private String nombre;
     private String categoria;
-    private BigDecimal precioCompra;
-    private BigDecimal precioVenta;
+    private Double precioCompra;
+    private Double precioVenta;
     private Integer stockDisponible;
     private Integer stockMinimo;
     private String ubicacion; // Formato "A-1-2"
-    private Boolean perecible;
-
+    private String proveedor; // <-- AÑADIDO
     // Constructor, Getters y Setters
 
     public ProductoInventarioDto() {
     }
 
-    public ProductoInventarioDto(Integer idProducto, String nombre, String categoria, BigDecimal precioCompra,
-            BigDecimal precioVenta, Integer stockDisponible, Integer stockMinimo, String ubicacion, Boolean perecible) {
+    public ProductoInventarioDto(Integer idProducto, String nombre, String categoria, Double precioCompra,
+            Double precioVenta, Integer stockDisponible, Integer stockMinimo, String ubicacion, String proveedor) {
         this.idProducto = idProducto;
         this.nombre = nombre;
         this.categoria = categoria;
@@ -30,7 +27,7 @@ public class ProductoInventarioDto {
         this.stockDisponible = stockDisponible;
         this.stockMinimo = stockMinimo;
         this.ubicacion = ubicacion;
-        this.perecible = perecible;
+        this.proveedor = proveedor; // <-- AÑADIDO
     }
 
     public Integer getIdProducto() {
@@ -57,19 +54,19 @@ public class ProductoInventarioDto {
         this.categoria = categoria;
     }
 
-    public BigDecimal getPrecioCompra() {
+    public Double getPrecioCompra() {
         return precioCompra;
     }
 
-    public void setPrecioCompra(BigDecimal precioCompra) {
+    public void setPrecioCompra(Double precioCompra) {
         this.precioCompra = precioCompra;
     }
 
-    public BigDecimal getPrecioVenta() {
+    public Double getPrecioVenta() {
         return precioVenta;
     }
 
-    public void setPrecioVenta(BigDecimal precioVenta) {
+    public void setPrecioVenta(Double precioVenta) {
         this.precioVenta = precioVenta;
     }
 
@@ -97,11 +94,12 @@ public class ProductoInventarioDto {
         this.ubicacion = ubicacion;
     }
 
-    public Boolean getPerecible() {
-        return perecible;
+    // --- AÑADIDO GETTER Y SETTER ---
+    public String getProveedor() {
+        return proveedor;
     }
 
-    public void setPerecible(Boolean perecible) {
-        this.perecible = perecible;
+    public void setProveedor(String proveedor) {
+        this.proveedor = proveedor;
     }
 }

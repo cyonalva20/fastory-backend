@@ -1,28 +1,25 @@
 package com.fastory.fastorybackend.entity;
 
 import jakarta.persistence.*;
-import org.hibernate.annotations.Filter;
 import java.util.List;
 
 @Entity
-@Table(name = "repisa", uniqueConstraints = {
-        @UniqueConstraint(name = "uq_repisa_tenant", columnNames = {"id_empresa", "codigo"})
-})
-@Filter(name = "tenantFilter", condition = "id_empresa = :empresaId")
-public class Repisa extends BaseEntity {
+@Table(name = "repisa")
+public class Repisa {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_repisa")
     private Integer idRepisa;
 
-    @Column(name = "codigo", nullable = false, length = 20)
+    @Column(name = "codigo", nullable = false, unique = true, length = 10)
     private String codigo;
+
+    @Column(name = "descripcion", length = 100)
+    private String descripcion;
 
     @OneToMany(mappedBy = "repisa", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Ubicacion> ubicaciones;
-
-    // --- Getters y Setters ---
 
     public Integer getIdRepisa() {
         return idRepisa;
@@ -38,6 +35,14 @@ public class Repisa extends BaseEntity {
 
     public void setCodigo(String codigo) {
         this.codigo = codigo;
+    }
+
+    public String getDescripcion() {
+        return descripcion;
+    }
+
+    public void setDescripcion(String descripcion) {
+        this.descripcion = descripcion;
     }
 
     public List<Ubicacion> getUbicaciones() {

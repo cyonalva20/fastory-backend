@@ -17,9 +17,8 @@ import com.fastory.fastorybackend.service.ReporteExportService;
 
 import java.io.ByteArrayOutputStream;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Map;
 
@@ -32,25 +31,28 @@ public class ReporteController {
 
     private final MovimientoService movimientoService;
 
-    @Autowired
+    @Autowired // Inyección del nuevo servicio
     private ReporteExportService reporteExportService;
 
-    private final DetalleMovimientoRepository detalleRepository;
-    private final com.fastory.fastorybackend.repository.ProveedorRepository proveedorRepository;
+    private final DetalleMovimientoRepository detalleRepository; // Inyectamos repositorio directamente para reportes de
+                                                                 // lectura
 
     /**
      * Endpoint 1: Genera el reporte de stock actual en formato JSON (para la
      * tabla).
+     * URL: GET /api/v1/reportes/stock-actual
      */
     @GetMapping("/stock-actual")
     public ResponseEntity<Object> generarReporteStockActual(
             @RequestParam(required = false) Integer categoriaId,
+            @RequestParam(required = false) String marca,
             @RequestParam(required = false) Boolean stockBajoMinimo,
             @RequestParam(defaultValue = "nombreProducto") String sortBy,
             @RequestParam(defaultValue = "asc") String sortDir) {
         try {
             List<ReporteDto> reporte = movimientoService.generarReporteStockActual(
                     categoriaId,
+                    marca,
                     stockBajoMinimo,
                     sortBy,
                     sortDir);
@@ -69,20 +71,28 @@ public class ReporteController {
         }
     }
 
+    // -------------------------------------------------------------------------
+    // --- NUEVO ENDPOINT PARA EXPORTACIÓN (PDF y Excel) ---
+    // -------------------------------------------------------------------------
+
     /**
      * Endpoint 2: Exporta el reporte de stock actual a PDF o Excel.
+     * URL: GET /api/v1/reportes/stock-actual/export?formato=excel
      */
     @GetMapping("/stock-actual/export")
     public ResponseEntity<Object> exportarReporteStockActual(
-            @RequestParam(required = true) String formato,
+            @RequestParam(required = true) String formato, // Parámetro obligatorio: excel o pdf
             @RequestParam(required = false) Integer categoriaId,
+            @RequestParam(required = false) String marca,
             @RequestParam(required = false) Boolean stockBajoMinimo,
             @RequestParam(defaultValue = "nombreProducto") String sortBy,
             @RequestParam(defaultValue = "asc") String sortDir) {
         try {
+            // 1. Obtener la data filtrada (reutilizamos el metodo del servicio)
             List<ReporteDto> data = movimientoService.generarReporteStockActual(
-                    categoriaId, stockBajoMinimo, sortBy, sortDir);
+                    categoriaId, marca, stockBajoMinimo, sortBy, sortDir);
 
+            // Criterio de Aceptación: Mensaje si no hay productos
             if (data.isEmpty()) {
                 return ResponseEntity.ok(Map.of("message", NO_PRODUCTS_MESSAGE));
             }
@@ -91,6 +101,7 @@ public class ReporteController {
             String filename;
             MediaType mediaType;
 
+            // 2. Generar el archivo según el formato solicitado
             if (formato.equalsIgnoreCase("excel")) {
                 outputStream = reporteExportService.exportToExcel(data);
                 filename = "reporte_stock_actual.xlsx";
@@ -105,11 +116,13 @@ public class ReporteController {
                         .body(Map.of("error", "Formato de exportación no válido. Use 'excel' o 'pdf'."));
             }
 
+            // 3. Configurar las Cabeceras HTTP para forzar la descarga
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(mediaType);
             headers.setContentDisposition(
                     ContentDisposition.builder("attachment").filename(filename).build());
 
+            // 4. Devolver la respuesta binaria
             return new ResponseEntity<>(outputStream.toByteArray(), headers, HttpStatus.OK);
 
         } catch (Exception e) {
@@ -118,15 +131,15 @@ public class ReporteController {
         }
     }
 
-    // --- ENDPOINTS ANALÍTICOS ---
+    // --- NUEVOS ENDPOINTS ANALÍTICOS ---
 
     @GetMapping("/mas-vendidos")
     public ResponseEntity<Object> reporteMasVendidos(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate desde,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate hasta) {
 
-        OffsetDateTime inicio = desde.atStartOfDay().atOffset(ZoneOffset.UTC);
-        OffsetDateTime fin = hasta.atTime(LocalTime.MAX).atOffset(ZoneOffset.UTC);
+        LocalDateTime inicio = desde.atStartOfDay();
+        LocalDateTime fin = hasta.atTime(LocalTime.MAX);
 
         List<ReportesAnaliticosDto.ProductoMasVendidoProjection> data = detalleRepository
                 .findProductosMasVendidos(inicio, fin);
@@ -140,8 +153,8 @@ public class ReporteController {
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate hasta,
             @RequestParam Long umbral) {
 
-        OffsetDateTime inicio = desde.atStartOfDay().atOffset(ZoneOffset.UTC);
-        OffsetDateTime fin = hasta.atTime(LocalTime.MAX).atOffset(ZoneOffset.UTC);
+        LocalDateTime inicio = desde.atStartOfDay();
+        LocalDateTime fin = hasta.atTime(LocalTime.MAX);
 
         List<ReportesAnaliticosDto.ProductoBajaRotacionProjection> data = detalleRepository
                 .findProductosBajaRotacion(inicio, fin, umbral);
@@ -151,21 +164,15 @@ public class ReporteController {
 
     @GetMapping("/entradas-proveedor")
     public ResponseEntity<Object> reporteEntradasProveedor(
-            @RequestParam Long idProveedor,
+            @RequestParam Integer idProveedor,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate desde,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate hasta) {
 
-        OffsetDateTime inicio = desde.atStartOfDay().atOffset(ZoneOffset.UTC);
-        OffsetDateTime fin = hasta.atTime(LocalTime.MAX).atOffset(ZoneOffset.UTC);
-
-        String proveedorNombre = proveedorRepository.findById(idProveedor.intValue())
-                .map(com.fastory.fastorybackend.entity.Proveedor::getNombreProveedor)
-                .orElse("");
-                
-        String proveedorMotivo = "Entrada de proveedor: " + proveedorNombre;
+        LocalDateTime inicio = desde.atStartOfDay();
+        LocalDateTime fin = hasta.atTime(LocalTime.MAX);
 
         List<ReportesAnaliticosDto.EntradaProveedorProjection> data = detalleRepository
-                .findEntradasPorProveedor(proveedorMotivo, inicio, fin);
+                .findEntradasPorProveedor(idProveedor, inicio, fin);
 
         return ResponseEntity.ok(data);
     }

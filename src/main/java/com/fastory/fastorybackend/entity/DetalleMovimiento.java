@@ -1,13 +1,11 @@
 package com.fastory.fastorybackend.entity;
 
 import jakarta.persistence.*;
-import org.hibernate.annotations.Filter;
-import java.math.BigDecimal;
+import java.time.LocalDateTime; // <-- Usamos LocalDateTime
 
 @Entity
 @Table(name = "detalle_movimiento")
-@Filter(name = "tenantFilter", condition = "id_empresa = :empresaId")
-public class DetalleMovimiento extends BaseEntity {
+public class DetalleMovimiento {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,20 +20,37 @@ public class DetalleMovimiento extends BaseEntity {
     @JoinColumn(name = "id_producto", nullable = false)
     private Producto producto;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_lote")
-    private Lote lote;
-
     @Column(name = "cantidad", nullable = false)
     private Integer cantidad;
 
-    @Column(name = "precio_compra", precision = 10, scale = 2)
-    private BigDecimal precioCompra;
+    // --- COLUMNAS PARA EL REGISTRO DE ENTRADA ---
 
-    @Column(name = "precio_venta", precision = 10, scale = 2)
-    private BigDecimal precioVenta;
+    @Column(name = "precio_compra")
+    private Double precioCompra;
 
-    // --- Getters y Setters ---
+    @Column(name = "precio_venta")
+    private Double precioVenta;
+
+    @Column(name = "fecha_vencimiento")
+    private LocalDateTime fechaVencimiento; // <-- ¡Cambiado a LocalDateTime!
+
+    @Column(name = "observacion_detalle")
+    private String observacionDetalle;
+
+    // --- NUEVAS COLUMNAS PARA AJUSTES DE INVENTARIO ---
+    @Column(name = "stock_anterior")
+    private Integer stockAnterior;
+
+    @Column(name = "stock_nuevo")
+    private Integer stockNuevo;
+
+    @Column(name = "id_lote")
+    private Integer idLote;
+
+    // -------------------------------------------------------------
+
+    // --- Getters y Setters (Asegúrate de cambiar el tipo en el setter/getter de
+    // fechaVencimiento) ---
 
     public Integer getIdDetalle() {
         return idDetalle;
@@ -61,14 +76,6 @@ public class DetalleMovimiento extends BaseEntity {
         this.producto = producto;
     }
 
-    public Lote getLote() {
-        return lote;
-    }
-
-    public void setLote(Lote lote) {
-        this.lote = lote;
-    }
-
     public Integer getCantidad() {
         return cantidad;
     }
@@ -77,19 +84,60 @@ public class DetalleMovimiento extends BaseEntity {
         this.cantidad = cantidad;
     }
 
-    public BigDecimal getPrecioCompra() {
+    public Double getPrecioCompra() {
         return precioCompra;
     }
 
-    public void setPrecioCompra(BigDecimal precioCompra) {
+    public void setPrecioCompra(Double precioCompra) {
         this.precioCompra = precioCompra;
     }
 
-    public BigDecimal getPrecioVenta() {
+    public Double getPrecioVenta() {
         return precioVenta;
     }
 
-    public void setPrecioVenta(BigDecimal precioVenta) {
+    public void setPrecioVenta(Double precioVenta) {
         this.precioVenta = precioVenta;
+    }
+
+    public LocalDateTime getFechaVencimiento() {
+        return fechaVencimiento;
+    } // <-- Tipo LocalDateTime
+
+    public void setFechaVencimiento(LocalDateTime fechaVencimiento) {
+        this.fechaVencimiento = fechaVencimiento;
+    } // <-- Tipo LocalDateTime
+
+    public String getObservacionDetalle() {
+        return observacionDetalle;
+    }
+
+    public void setObservacionDetalle(String observacionDetalle) {
+        this.observacionDetalle = observacionDetalle;
+    }
+
+    public Integer getIdLote() {
+        return idLote;
+    }
+
+    public void setIdLote(Integer idLote) {
+        this.idLote = idLote;
+    }
+
+    // --- NUEVOS GETTERS Y SETTERS ---
+    public Integer getStockAnterior() {
+        return stockAnterior;
+    }
+
+    public void setStockAnterior(Integer stockAnterior) {
+        this.stockAnterior = stockAnterior;
+    }
+
+    public Integer getStockNuevo() {
+        return stockNuevo;
+    }
+
+    public void setStockNuevo(Integer stockNuevo) {
+        this.stockNuevo = stockNuevo;
     }
 }
