@@ -18,10 +18,16 @@ import com.fastory.fastorybackend.entity.Usuario;
 import com.fastory.fastorybackend.repository.RolRepository;
 import com.fastory.fastorybackend.repository.UsuarioRepository;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
+
 @RestController
 @RequestMapping("/auth")
 @CrossOrigin
 public class AuthController {
+
+    private static final Logger log = LoggerFactory.getLogger(AuthController.class);
 
     @Autowired
     private AuthenticationManager authenticationManager;
@@ -57,9 +63,23 @@ public class AuthController {
                     usuario.getIdUsuario() // <-- AÑADIDO
             );
 
+            // Log estructurado para Grafana (Ingreso exitoso)
+            MDC.put("job", "login");
+            MDC.put("user", request.getUsername());
+            MDC.put("action", "User login");
+            log.info("Usuario autenticado exitosamente");
+            MDC.clear();
+
             return ResponseEntity.ok(response);
 
         } catch (Exception e) {
+            // Log estructurado para Grafana (Ingreso fallido)
+            MDC.put("job", "login");
+            MDC.put("user", request.getUsername());
+            MDC.put("action", "Login failed");
+            log.warn("Fallo de autenticación");
+            MDC.clear();
+
             return ResponseEntity.status(401).body(
                     new LoginResponse("Credenciales inválidas", null, null, null));
         }

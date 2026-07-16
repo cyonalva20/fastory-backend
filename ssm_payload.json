@@ -1,0 +1,17 @@
+{
+    "TimeoutSeconds":  600,
+    "Parameters":  {
+                       "commands":  [
+                                        "#!/bin/bash\necho \u0027--- 1. Instalando Docker si no existe ---\u0027\nif ! command -v docker \u0026\u003e /dev/null; then\n    sudo yum update -y\n    sudo yum install -y docker\n    sudo systemctl enable docker\n    sudo systemctl start docker\n    sudo usermod -aG docker ec2-user\nfi\n\necho \u0027--- 2. Obteniendo credenciales de la BD y JWT ---\u0027\nREGION=\"us-east-1\"\nRDS_SECRET=$(aws secretsmanager get-secret-value --secret-id fastory-production/rds-proxy-credentials --region $REGION --query SecretString --output text)\nJWT_SECRET=$(aws secretsmanager get-secret-value --secret-id fastory/jwt-secret --region $REGION --query SecretString --output text)\n\nDB_USER=$(echo $RDS_SECRET | grep -o \u0027\"username\":\"[^\"]*\u0027 | cut -d\u0027\"\u0027 -f4)\nDB_PASS=$(echo $RDS_SECRET | grep -o \u0027\"password\":\"[^\"]*\u0027 | cut -d\u0027\"\u0027 -f4)\nDB_HOST=$(echo $RDS_SECRET | grep -o \u0027\"host\":\"[^\"]*\u0027 | cut -d\u0027\"\u0027 -f4)\nDB_PORT=$(echo $RDS_SECRET | grep -o \u0027\"port\":[0-9]*\u0027 | cut -d\u0027:\u0027 -f2)\nDB_NAME=$(echo $RDS_SECRET | grep -o \u0027\"dbname\":\"[^\"]*\u0027 | cut -d\u0027\"\u0027 -f4)\n\necho \u0027--- 3. Descargando imagen desde S3 ---\u0027\naws s3 cp s3://fastory-production-frontend/backend.tar /tmp/backend.tar\n\necho \u0027--- 4. Cargando imagen en Docker ---\u0027\nsudo docker load -i /tmp/backend.tar\n\necho \u0027--- 5. Deteniendo contenedor anterior si existe ---\u0027\nsudo docker stop fastory-backend || true\nsudo docker rm fastory-backend || true\n\necho \u0027--- 6. Levantando nuevo contenedor ---\u0027\nsudo docker run -d \\\n  --name fastory-backend \\\n  -p 8080:8080 \\\n  -e SPRING_DATASOURCE_URL=\"jdbc:postgresql://$DB_HOST:$DB_PORT/$DB_NAME\" \\\n  -e SPRING_DATASOURCE_USERNAME=\"$DB_USER\" \\\n  -e SPRING_DATASOURCE_PASSWORD=\"$DB_PASS\" \\\n  -e JWT_SECRET=\"$JWT_SECRET\" \\\n  -e PORT=\"8080\" \\\n  fastory-backend:latest\n\necho \u0027--- Despliegue Finalizado ---\u0027"
+                                    ]
+                   },
+    "DocumentName":  "AWS-RunShellScript",
+    "Targets":  [
+                    {
+                        "Key":  "InstanceIds",
+                        "Values":  [
+                                       "i-0d5815561fbc5f5d2"
+                                   ]
+                    }
+                ]
+}
