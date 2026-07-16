@@ -80,6 +80,12 @@
             <groupId>io.micrometer</groupId>
             <artifactId>micrometer-registry-prometheus</artifactId>
         </dependency>
+        <!-- Loki4j: envia logs estructurados directamente a Grafana Loki -->
+        <dependency>
+            <groupId>com.github.loki4j</groupId>
+            <artifactId>loki-logback-appender</artifactId>
+            <version>1.5.2</version>
+        </dependency>
 
         <dependency>
             <groupId>org.apache.poi</groupId>

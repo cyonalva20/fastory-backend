@@ -1,0 +1,17 @@
+{
+    "TimeoutSeconds":  600,
+    "Parameters":  {
+                       "commands":  [
+                                        "#!/bin/bash\nREGION=\"us-east-1\"\nRDS_SECRET=$(aws secretsmanager get-secret-value --secret-id fastory-production/rds-proxy-credentials --region $REGION --query SecretString --output text)\nJWT_SECRET=$(aws secretsmanager get-secret-value --secret-id fastory/jwt-secret --region $REGION --query SecretString --output text)\n\nDB_USER=$(echo $RDS_SECRET | grep -o \u0027\"username\":\"[^\"]*\u0027 | cut -d\u0027\"\u0027 -f4)\nDB_PASS=$(echo $RDS_SECRET | grep -o \u0027\"password\":\"[^\"]*\u0027 | cut -d\u0027\"\u0027 -f4)\nDB_HOST=$(echo $RDS_SECRET | grep -o \u0027\"host\":\"[^\"]*\u0027 | cut -d\u0027\"\u0027 -f4)\nDB_PORT=$(echo $RDS_SECRET | grep -o \u0027\"port\":[0-9]*\u0027 | cut -d\u0027:\u0027 -f2)\nDB_NAME=$(echo $RDS_SECRET | grep -o \u0027\"dbname\":\"[^\"]*\u0027 | cut -d\u0027\"\u0027 -f4)\n\nsudo docker stop fastory-backend || true\nsudo docker rm fastory-backend || true\n\nsudo docker run -d \\\n  --name fastory-backend \\\n  -p 8080:8080 \\\n  -e SPRING_DATASOURCE_URL=\"jdbc:postgresql://$DB_HOST:$DB_PORT/$DB_NAME\" \\\n  -e SPRING_DATASOURCE_USERNAME=\"$DB_USER\" \\\n  -e SPRING_DATASOURCE_PASSWORD=\"$DB_PASS\" \\\n  -e JWT_SECRET=\"$JWT_SECRET\" \\\n  -e PORT=\"8080\" \\\n  fastory-backend:latest"
+                                    ]
+                   },
+    "DocumentName":  "AWS-RunShellScript",
+    "Targets":  [
+                    {
+                        "Key":  "InstanceIds",
+                        "Values":  [
+                                       "i-0d5815561fbc5f5d2"
+                                   ]
+                    }
+                ]
+}
